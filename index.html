@@ -14,119 +14,159 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #0f172a;
+            background: #f1f5f9;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #334155;
+            background: #cbd5e1;
             border-radius: 3px;
         }
     </style>
 </head>
 
-<body class="bg-[#0b0f19] text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
 
-    <!-- Top Navigation Bar -->
-    <header class="h-14 bg-[#111827] border-b border-slate-800 flex items-center justify-between px-4 shrink-0">
+    <!-- Top Navigation Bar (Real Codelab Design) -->
+    <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
         <div class="flex items-center space-x-3">
-            <span class="bg-orange-600 text-xs font-bold px-2.5 py-1 rounded text-white">VLearn</span>
-            <h1 class="text-sm font-semibold text-slate-100">Lab 01 – Nền tảng LLM API & Phân Công Nhóm</h1>
+            <button class="text-slate-500 hover:text-slate-900 transition mr-2">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <h1 class="text-sm font-bold text-slate-800">Lab 01 – Nền tảng LLM API</h1>
         </div>
-        <div class="flex items-center space-x-2 text-xs">
+
+        <div class="flex items-center space-x-4 text-xs">
+            <!-- Mock Student Database tag -->
             <span
-                class="bg-blue-950 text-blue-400 border border-blue-800 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                <i class="fa-solid fa-database animate-pulse text-[10px]"></i> Mock Student Database
+                class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-database text-[10px]"></i> Mock Database
             </span>
+            <!-- Time Capsule -->
+            <div
+                class="flex items-center space-x-1.5 bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-full font-mono text-[11px] font-medium">
+                <i class="fa-regular fa-clock"></i>
+                <span>Còn 3:59:55</span>
+                <i class="fa-solid fa-pause text-[9px] ml-1 opacity-70 hover:opacity-100 cursor-pointer"></i>
+            </div>
+            <!-- Language Selector -->
+            <button
+                class="flex items-center space-x-1 bg-slate-100 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:border-slate-300 hover:text-slate-950 transition font-medium">
+                <i class="fa-solid fa-globe text-[11px]"></i>
+                <span>Tiếng Việt</span>
+                <i class="fa-solid fa-chevron-down text-[9px] opacity-70"></i>
+            </button>
+            <!-- Light/Dark Mode -->
+            <button class="text-slate-500 hover:text-slate-900 p-1.5 rounded-full hover:bg-slate-100 transition">
+                <i class="fa-regular fa-moon text-sm"></i>
+            </button>
+            <!-- Avatar indicator -->
+            <div
+                class="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-blue-600 font-bold flex items-center justify-center text-xs">
+                2
+            </div>
         </div>
     </header>
 
     <!-- Main Workspace -->
     <div class="flex-1 flex overflow-hidden">
 
-        <!-- Left: Codelab Content (Nội dung bài học & Khái niệm) -->
-        <main class="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto space-y-6">
-            <div class="border-b border-slate-800 pb-4">
-                <span class="text-xs text-orange-400 font-semibold tracking-wide uppercase">Codelab Interactive</span>
-                <h2 class="text-2xl font-bold text-white mt-1">Hoàn thành Task: Tích hợp GPT-4o & Đo Latency</h2>
+        <!-- Left Sidebar: Step Navigation (Real Codelab Design) -->
+        <aside class="w-[280px] bg-slate-50 border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto py-4"
+            id="step-sidebar">
+            <div class="space-y-1.5 px-3" id="step-navigation-list">
+                <!-- Dynamically loaded step buttons -->
+            </div>
+        </aside>
+
+        <!-- Center: Codelab Content (Nội dung bài học & Khái niệm) -->
+        <main class="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto space-y-6" id="main-content-area">
+            <!-- Active Step Banner -->
+            <div class="border-b border-slate-200 pb-4">
+                <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Codelab Interactive - Bước
+                    <span id="current-step-num">1</span></span>
+                <h2 class="text-2xl font-bold text-slate-900 mt-1" id="step-title">1. Mở đúng repo và nhìn thấy đích đến
+                </h2>
             </div>
 
-            <!-- Các bước bài học -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
-                <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-list-ol text-orange-400"></i> Các bước thực hiện:
-                </h3>
-                <div class="space-y-3 text-xs text-slate-300">
-                    <div
-                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
-                        <div>
-                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 1: Khởi tạo OpenAI Client</strong>
-                            <span>Import thư viện <code class="text-orange-300">openai</code> và thiết lập API Key trong
-                                biến môi trường.</span>
-                        </div>
-                        <button onclick="askAgentExplain('Bước 1: Khởi tạo OpenAI Client')"
-                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
-                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
-                        </button>
+            <!-- "Trước khi bắt đầu" Info Card -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                <div class="flex items-start justify-between">
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-blue-600"></i> Trước khi bắt đầu
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed" id="step-summary-box">
+                            Học viên hoàn thiện toàn bộ TODO trong template.py: API cơ bản, system prompt và token,
+                            streaming/retry, rồi ghép thành trợ lý CLI.
+                        </p>
                     </div>
+                    <span
+                        class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase shrink-0">Cơ
+                        bản</span>
+                </div>
 
-                    <div
-                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
-                        <div>
-                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 2: Gửi Message & Điều chỉnh
-                                Temperature</strong>
-                            <span>Tạo đối tượng chat completion với các tham số <code
-                                    class="text-orange-300">temperature</code> và <code
-                                    class="text-orange-300">top_p</code>.</span>
-                        </div>
-                        <button onclick="askAgentExplain('Bước 2: Gửi Message & Điều chỉnh Temperature')"
-                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
-                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
-                        </button>
+                <!-- Metadata Grid -->
+                <div class="grid grid-cols-3 gap-4 pt-3 border-t border-slate-200 text-xs">
+                    <div>
+                        <span class="text-slate-400 block mb-0.5"><i class="fa-regular fa-clock mr-1"></i> Thời lượng dự
+                            kiến</span>
+                        <strong class="text-slate-700" id="step-duration">240 phút</strong>
                     </div>
-
-                    <div
-                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
-                        <div>
-                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 3: Bấm giờ & Tính Latency</strong>
-                            <span>Dùng <code class="text-orange-300">time.perf_counter()</code> đo thời gian trước và
-                                sau khi gửi request.</span>
-                        </div>
-                        <button onclick="askAgentExplain('Bước 3: Bấm giờ & Tính Latency')"
-                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
-                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
-                        </button>
+                    <div>
+                        <span class="text-slate-400 block mb-0.5"><i class="fa-solid fa-microchip mr-1"></i> Môi trường
+                            cần có</span>
+                        <strong class="text-slate-700" id="step-environment">Windows, macOS, Linux...</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mb-0.5"><i class="fa-solid fa-key mr-1"></i> Cần biết
+                            trước</span>
+                        <strong class="text-slate-700" id="step-prerequisite">Biết hàm Python, list và dict cơ
+                            bản</strong>
                     </div>
                 </div>
             </div>
 
-            <!-- Bảng Khái Niệm -->
-            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-3">
-                <h3 class="text-sm font-semibold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-book-bookmark text-orange-400"></i> Khái niệm trọng tâm (Bấm để Agent giải
+            <!-- Objectives List Card -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Xong bước này, bạn sẽ:</h3>
+                <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600" id="step-objectives">
+                    <!-- Loaded dynamically -->
+                </ul>
+            </div>
+
+            <!-- Detailed Steps / Explain Triggers -->
+            <div id="step-details-container">
+                <!-- Loaded dynamically -->
+            </div>
+
+            <!-- Bảng Khái Niệm Trọng Tâm -->
+            <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-orange-600"></i> Khái niệm trọng tâm (Bấm để Agent giải
                     thích):
                 </h3>
                 <div class="grid grid-cols-2 gap-3 text-xs">
                     <button onclick="askAgentExplain('Khái niệm: Latency trong LLM')"
-                        class="p-3 bg-slate-800/30 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-left transition group">
+                        class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
                         <div
-                            class="font-bold text-orange-400 group-hover:text-orange-300 flex items-center justify-between">
+                            class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
                             <span>Latency (Độ trễ)</span>
                             <i
                                 class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
                         </div>
-                        <div class="text-slate-400 mt-1 text-[11px]">Thời gian từ khi gửi prompt đến khi nhận câu trả
+                        <div class="text-slate-500 mt-1 text-[11px]">Thời gian từ khi gửi prompt đến khi nhận câu trả
                             lời.</div>
                     </button>
 
                     <button onclick="askAgentExplain('Khái niệm: Temperature')"
-                        class="p-3 bg-slate-800/30 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-left transition group">
+                        class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
                         <div
-                            class="font-bold text-orange-400 group-hover:text-orange-300 flex items-center justify-between">
+                            class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
                             <span>Temperature</span>
                             <i
                                 class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
                         </div>
-                        <div class="text-slate-400 mt-1 text-[11px]">Tham số điều chỉnh mức độ ngẫu nhiên/sáng tạo của
+                        <div class="text-slate-500 mt-1 text-[11px]">Tham số điều chỉnh mức độ ngẫu nhiên/sáng tạo của
                             model.</div>
                     </button>
                 </div>
@@ -134,113 +174,142 @@
         </main>
 
         <!-- Right: AI Agent Overlay Panel -->
-        <aside class="w-[440px] bg-[#111827] border-l border-slate-800 flex flex-col h-full shadow-2xl shrink-0">
+        <aside id="agent-panel"
+            class="w-[440px] bg-white border-l border-slate-200 flex flex-col h-full shadow-2xl shrink-0 relative transition-all duration-300 ease-in-out">
+            <!-- Collapse/Expand Toggle Handle -->
+            <button id="panel-toggle-btn" onclick="toggleAgentPanel()"
+                class="absolute right-full top-1/2 -translate-y-1/2 w-6 h-20 bg-white hover:bg-slate-50 border border-r-0 border-slate-200 rounded-l-xl flex items-center justify-center text-slate-400 hover:text-slate-800 transition shadow-lg cursor-pointer z-30 focus:outline-none">
+                <i id="toggle-icon" class="fa-solid fa-chevron-right text-[10px]"></i>
+            </button>
 
-            <!-- Agent Navigation Tabs -->
-            <div class="flex border-b border-slate-800 bg-slate-900/80 text-xs font-semibold">
-                <button id="tab-btn-explain" onclick="switchTab('explain')"
-                    class="flex-1 py-3 border-b-2 border-orange-500 text-orange-400 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-brain"></i> 1. Giải Thích / Tóm Tắt
-                </button>
-                <button id="tab-btn-role" onclick="switchTab('role')"
-                    class="flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-users-gear"></i> 2. Chia Role Nhóm
-                </button>
-            </div>
-
-            <!-- TAB 1: CHỨC NĂNG 1 - TÓM TẮT & GIẢI THÍCH CHI TIẾT -->
-            <div id="tab-explain" class="flex-1 flex flex-col overflow-hidden p-4 space-y-3">
-                <div
-                    class="bg-slate-900 border border-slate-800 p-2.5 rounded-lg text-xs text-slate-300 flex justify-between items-center">
-                    <span>Chế độ phản hồi:</span>
-                    <div class="flex bg-slate-800 p-1 rounded gap-1 text-[11px]">
-                        <button id="mode-summary" onclick="setExplainMode('summary')"
-                            class="px-2 py-0.5 rounded bg-orange-600 text-white font-medium">Tóm tắt</button>
-                        <button id="mode-detail" onclick="setExplainMode('detail')"
-                            class="px-2 py-0.5 rounded text-slate-400 hover:text-white">Chi tiết</button>
-                    </div>
-                </div>
-
-                <!-- Chat Messages Scroll Area -->
-                <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
-                    <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1.5">
-                        <div class="font-bold text-orange-400 flex items-center gap-1">
-                            <i class="fa-solid fa-robot"></i> AI Tutor
-                        </div>
-                        <p>Xin chào! Bạn có thể chọn một Bước hoặc Khái niệm bên bài học để tôi **Tóm tắt** hoặc **Giải
-                            thích chi tiết** nhé.</p>
-                    </div>
-                </div>
-
-                <!-- Input Box -->
-                <div class="pt-2 border-t border-slate-800 flex gap-2">
-                    <input type="text" id="user-input" placeholder="Nhập câu hỏi hoặc khái niệm..."
-                        class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500">
-                    <button onclick="handleUserSend()"
-                        class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-lg text-xs transition">
-                        <i class="fa-solid fa-paper-plane"></i>
+            <!-- Inner wrapper to prevent content squishing during transition -->
+            <div class="w-[440px] flex flex-col h-full shrink-0">
+                <!-- Agent Navigation Tabs -->
+                <div class="flex border-b border-slate-200 bg-white text-xs font-semibold">
+                    <button id="tab-btn-explain" onclick="switchTab('explain')"
+                        class="flex-1 py-3 border-b-2 border-orange-500 text-orange-600 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-brain"></i> 1. Giải Thích / Tóm Tắt
+                    </button>
+                    <button id="tab-btn-role" onclick="switchTab('role')"
+                        class="flex-1 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-users-gear"></i> 2. Chia Role Nhóm
                     </button>
                 </div>
-            </div>
 
-            <!-- TAB 2: CHỨC NĂNG 2 - CHỌN HỌC VIÊN TỪ DROPLIST & CHIA ROLE -->
-            <div id="tab-role" class="flex-1 flex flex-col overflow-y-auto p-4 space-y-4 text-xs hidden">
-
-                <!-- Droplist & Search Student Section -->
-                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl space-y-3">
-                    <div class="font-bold text-slate-100 flex items-center justify-between">
-                        <span><i class="fa-solid fa-id-card text-orange-400 mr-1.5"></i> Chọn / Điền Học Viên Vào
-                            Nhóm</span>
-                        <span class="text-[10px] bg-blue-900/50 text-blue-300 px-1.5 py-0.5 rounded">Mock
-                            Database</span>
+                <!-- TAB 1: CHỨC NĂNG 1 - TÓM TẮT & GIẢI THÍCH CHI TIẾT -->
+                <div id="tab-explain" class="flex-1 flex flex-col overflow-hidden p-4 space-y-3">
+                    <div
+                        class="bg-slate-100 border border-slate-200 p-2.5 rounded-lg text-xs text-slate-700 flex justify-between items-center">
+                        <span>Chế độ phản hồi:</span>
+                        <div class="flex bg-white p-1 rounded border border-slate-200 gap-1 text-[11px]">
+                            <button id="mode-summary" onclick="setExplainMode('summary')"
+                                class="px-2 py-0.5 rounded bg-orange-600 text-white font-medium">Tóm tắt</button>
+                            <button id="mode-detail" onclick="setExplainMode('detail')"
+                                class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-800">Chi tiết</button>
+                        </div>
                     </div>
 
-                    <!-- Autocomplete Search Input -->
-                    <div class="space-y-1 relative" id="search-container">
-                        <label class="text-[11px] text-slate-400">Tìm kiếm học viên (theo Tên hoặc Mã HV):</label>
-                        <div class="relative">
-                            <input type="text" id="student-search-input" oninput="handleSearchInput()"
-                                onfocus="showSuggestions()" placeholder="Nhập tên hoặc mã học viên..."
-                                class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-3 pr-10 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500">
-                            <div class="absolute right-3 top-2.5 text-slate-500 pointer-events-none">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </div>
+                    <!-- Personalization Buttons Section -->
+                    <div class="bg-white border border-slate-200 p-3 rounded-lg text-xs space-y-2">
+                        <span class="font-semibold text-slate-700 block"><i
+                                class="fa-solid fa-wand-magic-sparkles text-orange-500 mr-1"></i> Tạo Bản Hướng Dẫn Cá
+                            Nhân Hóa:</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="generateNonITGuide()"
+                                class="px-2.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded font-medium flex items-center justify-center gap-1 transition cursor-pointer">
+                                <span>🔰 Hướng dẫn Non-IT</span>
+                            </button>
+                            <button onclick="generateITGuide()"
+                                class="px-2.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded font-medium flex items-center justify-center gap-1 transition cursor-pointer">
+                                <span>💻 Hướng dẫn IT</span>
+                            </button>
                         </div>
-                        <!-- Suggestions Droplist -->
-                        <div id="student-suggestions" class="absolute z-20 w-full left-0 mt-1 bg-slate-950 border border-slate-800 rounded-lg shadow-xl max-h-52 overflow-y-auto hidden">
-                            <!-- Suggestions will be injected here dynamically -->
+                    </div>
+
+                    <!-- Chat Messages Scroll Area -->
+                    <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+                        <div
+                            class="bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm">
+                            <div class="font-bold text-orange-600 flex items-center gap-1">
+                                <i class="fa-solid fa-robot"></i> AI Tutor
+                            </div>
+                            <p>Xin chào! Bạn có thể chọn một Bước hoặc Khái niệm bên bài học để tôi **Tóm tắt** hoặc
+                                **Giải thích chi tiết** nhé.</p>
+                        </div>
+                    </div>
+
+                    <!-- Input Box -->
+                    <div class="pt-2 border-t border-slate-200 flex gap-2">
+                        <input type="text" id="user-input" placeholder="Nhập câu hỏi hoặc khái niệm..."
+                            class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500">
+                        <button onclick="handleUserSend()"
+                            class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CHỨC NĂNG 2 - CHỌN HỌC VIÊN TỪ DROPLIST & CHIA ROLE -->
+                <div id="tab-role" class="flex-1 flex flex-col overflow-y-auto p-4 space-y-4 text-xs hidden">
+
+                    <!-- Droplist & Search Student Section -->
+                    <div class="bg-white border border-slate-200 p-3.5 rounded-xl space-y-3 shadow-sm">
+                        <div class="font-bold text-slate-800 flex items-center justify-between">
+                            <span><i class="fa-solid fa-id-card text-orange-600 mr-1.5"></i> Chọn / Điền Học Viên Vào
+                                Nhóm</span>
+                            <span
+                                class="text-[10px] bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded font-medium">Mock
+                                Database</span>
+                        </div>
+
+                        <!-- Autocomplete Search Input -->
+                        <div class="space-y-1 relative" id="search-container">
+                            <label class="text-[11px] text-slate-500">Tìm kiếm học viên (theo Tên hoặc Mã HV):</label>
+                            <div class="relative">
+                                <input type="text" id="student-search-input" oninput="handleSearchInput()"
+                                    onfocus="showSuggestions()" placeholder="Nhập tên hoặc mã học viên..."
+                                    class="w-full bg-white border border-slate-200 rounded-lg pl-3 pr-10 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500">
+                                <div class="absolute right-3 top-2.5 text-slate-500 pointer-events-none">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </div>
+                            </div>
+                            <!-- Suggestions Droplist -->
+                            <div id="student-suggestions"
+                                class="absolute z-20 w-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-52 overflow-y-auto hidden text-slate-800">
+                                <!-- Suggestions will be injected here dynamically -->
+                            </div>
                         </div>
                     </div>
 
                     <!-- Selected Team List & Auto-fetched Skill Profiles -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-300 text-[11px] uppercase tracking-wider">
-                                <i class="fa-solid fa-users text-orange-400 mr-1"></i> Thành viên đã chọn (<span
+                            <h4 class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">
+                                <i class="fa-solid fa-users text-orange-600 mr-1"></i> Thành viên đã chọn (<span
                                     id="team-count">0</span>):
                             </h4>
                             <button onclick="clearTeam()"
-                                class="text-[10px] text-slate-500 hover:text-red-400 transition">Xóa tất cả</button>
+                                class="text-[10px] text-slate-500 hover:text-red-600 transition">Xóa tất cả</button>
                         </div>
 
                         <div id="team-list-container" class="space-y-2">
                             <div id="empty-team-msg"
-                                class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-[11px]">
-                                Chưa có học viên nào được chọn. Hãy chọn từ Droplist ở trên.
+                                class="p-4 text-center border border-dashed border-slate-200 rounded-xl text-slate-400 bg-white text-[11px]">
+                                Chưa có học viên nào được chọn. Hãy tìm kiếm học viên ở trên.
                             </div>
                         </div>
                     </div>
 
                     <!-- Role Assignment Button -->
                     <button id="btn-assign-role" onclick="generateRoleAssignment()" disabled
-                        class="w-full bg-slate-800 text-slate-500 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2">
+                        class="w-full bg-slate-200 text-slate-400 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2 border border-slate-100">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                         <span>Tự Động Phân Chia Role Theo Hồ Sơ</span>
                     </button>
 
                     <!-- Role Assignment Result -->
-                    <div id="role-result" class="hidden space-y-3 pt-2 border-t border-slate-800">
-                        <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+                    <div id="role-result" class="hidden space-y-3 pt-2 border-t border-slate-200">
+                        <div class="font-bold text-emerald-600 flex items-center gap-1.5">
                             <i class="fa-solid fa-square-check"></i> Kết quả phân công dựa trên Hồ sơ:
                         </div>
                         <div id="role-cards-container" class="space-y-2">
@@ -249,6 +318,7 @@
                     </div>
 
                 </div>
+            </div>
         </aside>
     </div>
 
@@ -360,31 +430,55 @@
             document.getElementById('mode-detail').className = mode === 'detail' ? 'px-2 py-0.5 rounded bg-orange-600 text-white font-medium' : 'px-2 py-0.5 rounded text-slate-400 hover:text-white';
         }
 
+        function toggleAgentPanel() {
+            const panel = document.getElementById('agent-panel');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleBtn = document.getElementById('panel-toggle-btn');
+            const bubble = document.getElementById('ai-bubble');
+            const isCollapsed = panel.classList.contains('w-0');
+
+            if (isCollapsed) {
+                // Expand
+                panel.classList.remove('w-0', 'overflow-hidden', 'border-l-0');
+                panel.classList.add('w-[440px]', 'border-l');
+                toggleIcon.className = "fa-solid fa-chevron-right text-[10px]";
+                bubble.classList.add('hidden');
+                toggleBtn.classList.remove('hidden');
+            } else {
+                // Collapse
+                panel.classList.remove('w-[440px]', 'border-l');
+                panel.classList.add('w-0', 'overflow-hidden', 'border-l-0');
+                toggleIcon.className = "fa-solid fa-chevron-left text-[10px]";
+                bubble.classList.remove('hidden');
+                toggleBtn.classList.add('hidden');
+            }
+        }
+
         function askAgentExplain(topic) {
             switchTab('explain');
             const chatBox = document.getElementById('chat-box');
 
             const userMsg = document.createElement('div');
-            userMsg.className = "bg-orange-600/20 border border-orange-500/30 p-2.5 rounded-xl text-slate-200 ml-6 text-right";
-            userMsg.innerHTML = `<span class="text-[10px] text-orange-400 block mb-0.5">Bạn hỏi (${currentMode === 'summary' ? 'Tóm tắt' : 'Chi tiết'}):</span> ${topic}`;
+            userMsg.className = "bg-orange-50 border border-orange-200 p-2.5 rounded-xl text-slate-800 ml-6 text-right shadow-sm";
+            userMsg.innerHTML = `<span class="text-[10px] text-orange-600 block mb-0.5">Bạn hỏi (${currentMode === 'summary' ? 'Tóm tắt' : 'Chi tiết'}):</span> ${topic}`;
             chatBox.appendChild(userMsg);
 
             setTimeout(() => {
                 const aiMsg = document.createElement('div');
-                aiMsg.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1.5";
+                aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm";
 
                 let responseText = "";
                 if (currentMode === 'summary') {
                     responseText = `<strong>[Tóm tắt ngắn]:</strong> ${topic} giúp thiết lập kết nối và điều phối dữ liệu với mô hình AI trong thời gian ngắn nhất, tối ưu hiệu năng gọi API.`;
                 } else {
                     responseText = `<strong>[Giải thích chi tiết]:</strong>
-                        <ul class="list-disc list-inside space-y-1 mt-1 text-slate-300">
+                        <ul class="list-disc list-inside space-y-1 mt-1 text-slate-600">
                             <li><strong>Bản chất:</strong> Thao tác với ${topic} điều chỉnh cách gói tin HTTP Request được đóng gói và gửi tới Server OpenAI.</li>
                             <li><strong>Ứng dụng:</strong> Giúp tính toán chính xác chi phí API trên mỗi lượt gọi và kiểm soát rủi ro Timeout.</li>
                         </ul>`;
                 }
 
-                aiMsg.innerHTML = `<div class="font-bold text-orange-400 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>${responseText}</div>`;
+                aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>${responseText}</div>`;
                 chatBox.appendChild(aiMsg);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }, 500);
@@ -426,22 +520,22 @@
                 if (query === '' || matchId || matchName) {
                     matchedCount++;
                     const item = document.createElement('div');
-                    item.className = "px-3 py-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center border-b border-slate-900/60 last:border-0";
+                    item.className = "px-3 py-2 hover:bg-slate-100 cursor-pointer flex justify-between items-center border-b border-slate-100 last:border-0";
 
                     const isAlreadySelected = selectedTeam.some(s => s.id === student.id);
                     let mainSkills = student.skills.slice(0, 2).map(s => s.name).join(', ');
 
                     item.innerHTML = `
                         <div class="flex flex-col text-left">
-                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                            <span class="font-semibold text-slate-800 flex items-center gap-1.5">
                                 ${student.name}
                                 <span class="text-[10px] text-slate-500 font-mono font-normal">(${student.id})</span>
                             </span>
-                            <span class="text-[10px] text-slate-400 mt-0.5">${mainSkills}</span>
+                            <span class="text-[10px] text-slate-500 mt-0.5">${mainSkills}</span>
                         </div>
                         ${isAlreadySelected ?
-                            `<span class="text-[10px] text-slate-500 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800 shrink-0">Đã chọn</span>` :
-                            `<span class="text-[10px] text-orange-400 hover:text-orange-300 font-medium shrink-0">Chọn</span>`
+                            `<span class="text-[10px] text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">Đã chọn</span>` :
+                            `<span class="text-[10px] text-orange-600 hover:text-orange-500 font-medium shrink-0">Chọn</span>`
                         }
                     `;
                     item.addEventListener('click', () => {
@@ -461,7 +555,7 @@
                 suggestionsContainer.classList.remove('hidden');
             } else {
                 const noResult = document.createElement('div');
-                noResult.className = "px-3 py-2.5 text-slate-500 text-center text-[11px]";
+                noResult.className = "px-3 py-2.5 text-slate-400 text-center text-[11px]";
                 noResult.innerText = "Không tìm thấy học viên nào";
                 suggestionsContainer.appendChild(noResult);
                 suggestionsContainer.classList.remove('hidden');
@@ -512,11 +606,11 @@
             countLabel.innerText = selectedTeam.length;
 
             if (selectedTeam.length === 0) {
-                container.innerHTML = `<div id="empty-team-msg" class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-[11px]">
+                container.innerHTML = `<div id="empty-team-msg" class="p-4 text-center border border-dashed border-slate-200 rounded-xl text-slate-400 bg-white text-[11px]">
                     Chưa có học viên nào được chọn. Hãy tìm kiếm học viên ở trên.
                 </div>`;
                 btnAssign.disabled = true;
-                btnAssign.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2";
+                btnAssign.className = "w-full bg-slate-200 text-slate-400 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2 border border-slate-100";
                 return;
             }
 
@@ -526,17 +620,17 @@
             let html = '';
             selectedTeam.forEach((student) => {
                 let skillBadges = student.skills.map(sk =>
-                    `<span class="bg-slate-800 text-orange-300 border border-slate-700 px-1.5 py-0.5 rounded text-[10px]">${sk.name}: ${sk.level}/5</span>`
+                    `<span class="bg-orange-50 text-orange-700 border border-orange-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${sk.name}: ${sk.level}/5</span>`
                 ).join(' ');
 
                 html += `
-                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl space-y-2 relative group">
+                <div class="bg-white border border-slate-200 p-3 rounded-xl space-y-2 relative group shadow-sm text-slate-800">
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-slate-100 flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-graduate text-orange-400"></i> ${student.name}
-                            <span class="text-[10px] text-slate-400 font-mono font-normal">(${student.id})</span>
+                        <span class="font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-graduate text-orange-600"></i> ${student.name}
+                            <span class="text-[10px] text-slate-500 font-mono font-normal">(${student.id})</span>
                         </span>
-                        <button onclick="removeStudent('${student.id}')" class="text-slate-500 hover:text-red-400 text-xs px-1.5 py-0.5 rounded transition">
+                        <button onclick="removeStudent('${student.id}')" class="text-slate-400 hover:text-red-600 text-xs px-1.5 py-0.5 rounded transition">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
@@ -568,19 +662,662 @@
                 let topSkill = student.skills.length > 0 ? student.skills[0].name : "General";
 
                 html += `
-                <div class="p-3 bg-slate-900/90 border border-orange-500/40 rounded-xl space-y-1.5">
-                    <div class="font-bold text-orange-300 flex justify-between items-center">
+                <div class="p-3 bg-white border border-orange-200 rounded-xl space-y-1.5 shadow-sm text-slate-700">
+                    <div class="font-bold text-orange-600 flex justify-between items-center">
                         <span>${student.name} ➔ ${role.title}</span>
-                        <span class="text-[10px] bg-orange-950 text-orange-300 border border-orange-800 px-1.5 py-0.5 rounded">${topSkill}</span>
+                        <span class="text-[10px] bg-orange-50 text-orange-700 border border-orange-200 px-1.5 py-0.5 rounded font-medium">${topSkill}</span>
                     </div>
-                    <p class="text-[11px] text-slate-300"><strong>Nhiệm vụ:</strong> ${role.desc}</p>
+                    <p class="text-[11px] text-slate-600"><strong>Nhiệm vụ:</strong> ${role.desc}</p>
                 </div>`;
             });
 
             container.innerHTML = html;
             resultBox.classList.remove('hidden');
         }
+
+        // Steps data mapping for dynamic rendering
+        const codelabSteps = {
+            1: {
+                title: "1. Mở đúng repo và nhìn thấy đích đến",
+                duration: "240 phút",
+                environment: "Windows, macOS, Linux · Python 3.10+ & Git",
+                prerequisite: "Biết sử dụng VS Code, Git clone",
+                summaryBox: "Học viên clone và mở repository chính của bài thực hành trên VS Code, đọc tài liệu hướng dẫn README.md.",
+                objectives: [
+                    "Mở đúng thư mục code dự án trên VS Code",
+                    "Đọc kỹ tài liệu hướng dẫn README.md và file cấu hình ban đầu",
+                    "Hiểu được cấu trúc thư mục của bài Lab 01"
+                ],
+                detailsHtml: `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-ol text-orange-600"></i> Các bước thực hiện:
+                            </h3>
+                            <div class="space-y-3 text-xs text-slate-600">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-slate-800 block text-sm mb-0.5">Bước 1: Khởi tạo OpenAI Client</strong>
+                                        <span>Import thư viện <code class="text-orange-600 bg-orange-50 px-1 rounded font-mono">openai</code> và thiết lập API Key trong biến môi trường.</span>
+                                    </div>
+                                    <button onclick="askAgentExplain('Bước 1: Khởi tạo OpenAI Client')"
+                                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 border border-slate-200 rounded text-[11px] transition shrink-0 cursor-pointer">
+                                        <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            2: {
+                title: "2. Tạo môi trường và chạy test baseline",
+                duration: "30 phút",
+                environment: "Python 3.10+, pip hoặc uv virtualenv",
+                prerequisite: "Hiểu lệnh cài đặt package pip",
+                summaryBox: "Tạo một môi trường Python ảo biệt lập cho bài học và tiến hành cài đặt toàn bộ dependencies trong file requirements.txt.",
+                objectives: [
+                    "Tạo thành công Python Virtual Environment (.venv)",
+                    "Cài đặt thư viện dependencies thành công",
+                    "Chạy lệnh kiểm tra baseline chạy thử đầu tiên"
+                ],
+                detailsHtml: `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-ol text-orange-600"></i> Các bước thực hiện:
+                            </h3>
+                            <div class="space-y-3 text-xs text-slate-600">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-slate-800 block text-sm mb-0.5">Bước 2: Gửi Message & Điều chỉnh Temperature</strong>
+                                        <span>Tạo đối tượng chat completion với các tham số <code class="text-orange-600 bg-orange-50 px-1 rounded font-mono">temperature</code> và <code class="text-orange-600 bg-orange-50 px-1 rounded font-mono">top_p</code>.</span>
+                                    </div>
+                                    <button onclick="askAgentExplain('Bước 2: Gửi Message & Điều chỉnh Temperature')"
+                                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 border border-slate-200 rounded text-[11px] transition shrink-0 cursor-pointer">
+                                        <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            3: {
+                title: "3. Hoàn thành Task 1: gọi GPT-4o và đo latency",
+                duration: "45 phút",
+                environment: "OpenAI API Key và biến môi trường .env",
+                prerequisite: "Sử dụng API RESTful hoặc Python Client",
+                summaryBox: "Thực hiện viết mã để gọi API GPT-4o, kết hợp sử dụng thư viện time để đo độ trễ mạng (Latency) và xử lý kết quả.",
+                objectives: [
+                    "Gọi thành công API GPT-4o từ client Python",
+                    "Sử dụng hàm perf_counter để tính toán thời gian phản hồi",
+                    "In ra kết quả latency trong log console"
+                ],
+                detailsHtml: `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-ol text-orange-600"></i> Các bước thực hiện:
+                            </h3>
+                            <div class="space-y-3 text-xs text-slate-600">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-slate-800 block text-sm mb-0.5">Bước 3: Bấm giờ & Tính Latency</strong>
+                                        <span>Dùng <code class="text-orange-600 bg-orange-50 px-1 rounded font-mono">time.perf_counter()</code> đo thời gian trước và sau khi gửi request.</span>
+                                    </div>
+                                    <button onclick="askAgentExplain('Bước 3: Bấm giờ & Tính Latency')"
+                                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 border border-slate-200 rounded text-[11px] transition shrink-0 cursor-pointer">
+                                        <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Populate steps 4 to 10
+        for (let i = 4; i <= 10; i++) {
+            const titles = {
+                4: "4. Task 2 – Gọi GPT-4o-mini bằng cách t...",
+                5: "5. Task 3 – So sánh hai model trên cùng...",
+                6: "6. Part 2 – System prompt, token và chi...",
+                7: "7. Part 3 – Streaming, history và retry",
+                8: "8. Part 4 – Ghép thành trợ lý CLI",
+                9: "9. Bonus – So sánh nhiều prompt và in...",
+                10: "10. Kiểm tra, phản ánh và nộp bài"
+            };
+            codelabSteps[i] = {
+                title: titles[i],
+                duration: "30 phút",
+                environment: "Môi trường thực hành Python của bài Lab",
+                prerequisite: "Hoàn thành các bước thực hành trước đó",
+                summaryBox: `Thực hiện nội dung bài học thuộc phần ${titles[i]}. Học viên triển khai mã nguồn tương ứng theo hướng dẫn trong file README.md.`,
+                objectives: [
+                    `Hiểu lý thuyết liên quan đến ${titles[i]}`,
+                    "Sửa đổi code mẫu và kiểm thử kết quả trên terminal",
+                    "Đảm bảo mã nguồn vượt qua các test suite tương ứng"
+                ],
+                detailsHtml: `
+                    <div class="space-y-4">
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-list-ol text-orange-600"></i> Yêu cầu bài học:
+                            </h3>
+                            <div class="space-y-3 text-xs text-slate-600">
+                                <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-slate-800 block text-sm mb-0.5">Yêu cầu của phần ${i}</strong>
+                                        <span>Triển khai các đoạn code theo yêu cầu chi tiết của tài liệu hướng dẫn Codelab.</span>
+                                    </div>
+                                    <button onclick="askAgentExplain('${titles[i]}')"
+                                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-orange-600 hover:text-white text-slate-700 border border-slate-200 rounded text-[11px] transition shrink-0 cursor-pointer">
+                                        <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
+        }
+
+        let currentActiveStep = 1;
+        let currentPersonalizedMode = 'original'; // 'original', 'non-it', 'it'
+
+        function renderStepSidebar() {
+            const container = document.getElementById('step-navigation-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 10; i++) {
+                const step = codelabSteps[i];
+                const isActive = (i === currentActiveStep);
+
+                const btn = document.createElement('button');
+                btn.onclick = () => setActiveStep(i);
+
+                if (isActive) {
+                    btn.className = "w-full text-left p-3 rounded-xl border border-blue-200 bg-blue-50/70 flex items-start space-x-3 transition group duration-200 cursor-pointer";
+                    btn.innerHTML = `
+                        <div class="w-6 h-6 rounded-full bg-blue-600 border border-blue-500 text-white font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">
+                            ${i}
+                        </div>
+                        <span class="text-xs font-semibold text-blue-700 line-clamp-2">${step.title}</span>
+                    `;
+                } else {
+                    btn.className = "w-full text-left p-3 rounded-xl border border-transparent hover:bg-slate-100 flex items-start space-x-3 transition group duration-200 cursor-pointer";
+                    btn.innerHTML = `
+                        <div class="w-6 h-6 rounded-full bg-slate-200 border border-slate-300 text-slate-500 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5 group-hover:border-slate-400 group-hover:text-slate-700">
+                            ${i}
+                        </div>
+                        <span class="text-xs text-slate-600 group-hover:text-slate-800 line-clamp-2">${step.title}</span>
+                    `;
+                }
+
+                container.appendChild(btn);
+            }
+        }
+
+        function setActiveStep(stepNum) {
+            currentActiveStep = stepNum;
+            renderStepSidebar();
+
+            if (currentPersonalizedMode === 'original') {
+                const step = codelabSteps[stepNum];
+                const mainContent = document.getElementById('main-content-area');
+
+                // Re-inject the original step layout structure (just in case it was replaced by guide view)
+                mainContent.innerHTML = `
+                    <!-- Active Step Banner -->
+                    <div class="border-b border-slate-200 pb-4">
+                        <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Codelab Interactive - Bước <span id="current-step-num">1</span></span>
+                        <h2 class="text-2xl font-bold text-slate-900 mt-1" id="step-title">1. Mở đúng repo và nhìn thấy đích đến</h2>
+                    </div>
+
+                    <!-- "Trước khi bắt đầu" Info Card -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                        <div class="flex items-start justify-between">
+                            <div class="space-y-1">
+                                <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-info text-blue-600"></i> Trước khi bắt đầu
+                                </h3>
+                                <p class="text-xs text-slate-600 leading-relaxed" id="step-summary-box">
+                                    Học viên hoàn thiện toàn bộ TODO trong template.py...
+                                </p>
+                            </div>
+                            <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase shrink-0">Cơ bản</span>
+                        </div>
+
+                        <!-- Metadata Grid -->
+                        <div class="grid grid-cols-3 gap-4 pt-3 border-t border-slate-200 text-xs">
+                            <div>
+                                <span class="text-slate-400 block mb-0.5"><i class="fa-regular fa-clock mr-1"></i> Thời lượng dự kiến</span>
+                                <strong class="text-slate-700" id="step-duration">240 phút</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block mb-0.5"><i class="fa-solid fa-microchip mr-1"></i> Môi trường cần có</span>
+                                <strong class="text-slate-700" id="step-environment">Windows, macOS, Linux...</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block mb-0.5"><i class="fa-solid fa-key mr-1"></i> Cần biết trước</span>
+                                <strong class="text-slate-700" id="step-prerequisite">Biết hàm Python, list và dict cơ bản</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Objectives List Card -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Xong bước này, bạn sẽ:</h3>
+                        <ul class="list-disc list-inside space-y-1.5 text-xs text-slate-600" id="step-objectives">
+                            <!-- Loaded dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Detailed Steps / Explain Triggers -->
+                    <div id="step-details-container">
+                        <!-- Loaded dynamically -->
+                    </div>
+
+                    <!-- Bảng Khái Niệm Trọng Tâm -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-book-bookmark text-orange-600"></i> Khái niệm trọng tâm (Bấm để Agent giải thích):
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <button onclick="askAgentExplain('Khái niệm: Latency trong LLM')"
+                                class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
+                                <div class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
+                                    <span>Latency (Độ trễ)</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                                </div>
+                                <div class="text-slate-505 mt-1 text-[11px] text-slate-500">Thời gian từ khi gửi prompt đến khi nhận câu trả lời.</div>
+                            </button>
+
+                            <button onclick="askAgentExplain('Khái niệm: Temperature')"
+                                class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
+                                <div class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
+                                    <span>Temperature</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                                </div>
+                                <div class="text-slate-505 mt-1 text-[11px] text-slate-500">Tham số điều chỉnh mức độ ngẫu nhiên/sáng tạo của model.</div>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('current-step-num').innerText = stepNum;
+                document.getElementById('step-title').innerText = step.title;
+                document.getElementById('step-summary-box').innerText = step.summaryBox;
+                document.getElementById('step-duration').innerText = step.duration;
+                document.getElementById('step-environment').innerText = step.environment;
+                document.getElementById('step-prerequisite').innerText = step.prerequisite;
+
+                // Render Objectives
+                const objectivesContainer = document.getElementById('step-objectives');
+                objectivesContainer.innerHTML = step.objectives.map(obj => `<li>${obj}</li>`).join('');
+
+                // Render details
+                document.getElementById('step-details-container').innerHTML = step.detailsHtml;
+            } else {
+                renderPersonalizedGuide(currentPersonalizedMode, stepNum);
+            }
+        }
+
+        // Personalized guides database mapping
+        const personalizedGuides = {
+            1: {
+                "non-it": {
+                    title: "🔰 Bản Hướng Dẫn cho Non-IT: Thao Tác Mở Repo",
+                    analogy: `
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl space-y-2">
+                            <strong>💡 Ẩn dụ thực tế giúp bạn dễ hiểu:</strong>
+                            <p class="text-xs leading-relaxed">
+                                Hãy tưởng tượng <strong>OpenAI Client</strong> giống như một <strong>"Người Phục Vụ"</strong> tại nhà hàng. 
+                                Để người phục vụ này lấy món cho bạn (ở đây là lấy câu trả lời từ AI), bạn cần đưa cho họ chiếc <strong>"Thẻ Thành Viên" (API Key)</strong> để xác minh quyền hạn. 
+                                Khi có thẻ này, người phục vụ sẽ ghi nhận yêu cầu và mang đến tận bàn cho bạn.
+                            </p>
+                        </div>
+                    `,
+                    steps: [
+                        "<strong>Mở ứng dụng soạn thảo mã nguồn VS Code:</strong> Click vào biểu tượng VS Code trên Desktop, chọn thư mục dự án đã tải về. Đây chính là không gian làm việc của chúng ta.",
+                        "<strong>Mở file chính cần sửa:</strong> Nhìn sang thanh bên trái của VS Code, tìm và nhấp đúp vào file `template.py` để mở giao diện viết code.",
+                        "<strong>Điền Thẻ Thành Viên (API Key):</strong> Hãy dán chiếc khóa bảo mật vào file cấu hình môi trường. Khóa này giúp chương trình biết bạn là ai để cho phép truy vấn AI."
+                    ],
+                    whyBox: "<strong>Tại sao phải làm việc này?</strong><br>Thiết lập đúng thư mục và thông tin tài khoản ban đầu giống như việc chuẩn bị đầy đủ nguyên liệu trước khi nấu ăn. Nếu không xác thực thẻ thành viên, AI sẽ từ chối trả lời mọi yêu cầu của bạn."
+                },
+                "it": {
+                    title: "💻 Technical Deep-Dive & Best Practices: OpenAI Setup",
+                    technicalFocus: `
+                        <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl space-y-2 font-mono text-[11px]">
+                            <strong>⚡ TECHNICAL SPECS & ARCHITECTURE:</strong>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Client Instance: Instantiated via 'openai.OpenAI()'. Thread-safe and reuse-friendly.</li>
+                                <li>Key Management: Always read from 'os.environ.get(\"OPENAI_API_KEY\")' or '.env' local file. Never hardcode keys in codebase!</li>
+                                <li>HTTP Transport: Uses httpx under the hood. Default timeouts can be configured in the client constructor.</li>
+                            </ul>
+                        </div>
+                    `,
+                    codeSnippet: `
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-slate-300 font-mono text-[11px] space-y-1.5 text-left">
+                            <span class="text-slate-500 block text-xs mb-1">// Best practice setup in Python:</span>
+                            <div class="text-slate-300">
+                                <span class="text-orange-400">import</span> os<br>
+                                <span class="text-orange-400">from</span> openai <span class="text-orange-400">import</span> OpenAI<br><br>
+                                <span class="text-slate-500"># Read API key securely</span><br>
+                                api_key = os.getenv(<span class="text-green-400">"OPENAI_API_KEY"</span>)<br>
+                                <span class="text-orange-400">if not</span> api_key:<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-orange-400">raise</span> <span class="text-blue-400">ValueError</span>(<span class="text-green-400">"Missing OPENAI_API_KEY env variable!"</span>)<br><br>
+                                <span class="text-slate-500"># Initialize client once</span><br>
+                                client = OpenAI(api_key=api_key)
+                            </div>
+                        </div>
+                    `,
+                    optimization: "<strong>Tối ưu hóa & Bảo mật:</strong><br>1. <strong>Environment Variables:</strong> Sử dụng thư viện `dotenv` để tự động load key từ file `.env` bị bỏ qua trong git (.gitignore).<br>2. <strong>Connection Pooling:</strong> OpenAI client quản lý một connection pool nội bộ. Tái sử dụng đối tượng client cho nhiều yêu cầu thay vì tạo mới ở mỗi hàm gọi API để giảm overhead bắt tay SSL/TCP."
+                }
+            },
+            2: {
+                "non-it": {
+                    title: "🔰 Bản Hướng Dẫn cho Non-IT: Setup Môi Trường",
+                    analogy: `
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl space-y-2">
+                            <strong>💡 Ẩn dụ thực tế giúp bạn dễ hiểu:</strong>
+                            <p class="text-xs leading-relaxed">
+                                Hãy tưởng tượng <strong>Virtual Environment (Môi trường ảo)</strong> như là một <strong>"Hộp Cát Nhỏ" (Sandbox)</strong> biệt lập trong sân chơi của bạn. 
+                                Khi bạn nghịch cát và lắp ghép đồ chơi trong hộp cát này, nó hoàn toàn không làm bừa bộn hay ảnh hưởng đến căn nhà chính của bạn. 
+                                Việc này giúp máy tính của bạn không bị xung đột khi cài đặt hàng loạt thư viện code khác nhau.
+                            </p>
+                        </div>
+                    `,
+                    steps: [
+                        "<strong>Tạo môi trường ảo biệt lập:</strong> Gõ lệnh tạo môi trường ảo vào ô gõ lệnh (Terminal) để máy tạo riêng một vùng hoạt động biệt lập.",
+                        "<strong>Cài đặt các ứng dụng bổ trợ:</strong> Nhập lệnh cài đặt các thư viện từ file `requirements.txt`. Hệ thống sẽ tự động tải các công cụ AI cần dùng về vùng hoạt động biệt lập đó.",
+                        "<strong>Chạy thử chương trình baseline:</strong> Nhấp lệnh chạy thử để kiểm tra xem hệ thống cơ bản đã nhận diện và hoạt động trơn tru chưa."
+                    ],
+                    whyBox: "<strong>Tại sao phải làm việc này?</strong><br>Nếu không tạo môi trường riêng, các phần mềm khác nhau trên máy tính có thể xung đột và làm hỏng chương trình của bạn. Hộp môi trường ảo này giúp mọi thứ luôn an toàn và sạch sẽ."
+                },
+                "it": {
+                    title: "💻 Technical Deep-Dive & Best Practices: Venv Isolation",
+                    technicalFocus: `
+                        <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl space-y-2 font-mono text-[11px]">
+                            <strong>⚡ TECHNICAL SPECS & ARCHITECTURE:</strong>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Python venv: Resolves dependency hell by isolating package installation.</li>
+                                <li>Package management: Use 'uv pip install' for ultra-fast multi-threaded installation, or standard 'pip install -r requirements.txt'.</li>
+                                <li>Lockfile Best Practice: Commit requirements.txt (or uv.lock) to lock exact semantic versions of dependencies for repeatable builds.</li>
+                            </ul>
+                        </div>
+                    `,
+                    codeSnippet: `
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-slate-300 font-mono text-[11px] space-y-1.5 text-left">
+                            <span class="text-slate-500 block text-xs mb-1">// Setup isolated env & install packages:</span>
+                            <div class="text-slate-300 font-mono">
+                                <span class="text-slate-500"># 1. Create virtual environment</span><br>
+                                python -m venv .venv<br><br>
+                                <span class="text-slate-500"># 2. Activate virtual environment (Windows)</span><br>
+                                .venv\\Scripts\\activate<br><br>
+                                <span class="text-slate-500"># 3. Upgrade pip & Install packages</span><br>
+                                pip install --upgrade pip<br>
+                                pip install -r requirements.txt
+                            </div>
+                        </div>
+                    `,
+                    optimization: "<strong>Tối ưu hóa & Bảo mật:</strong><br>1. <strong>Isolate Development:</strong> Luôn kiểm tra xem terminal có ký tự `(.venv)` ở đầu dòng để chắc chắn virtualenv đã được kích hoạt.<br>2. <strong>Prune Unused:</strong> Sử dụng các công cụ như `pip-audit` để quét các lỗ hổng bảo mật tiềm ẩn trong các thư viện package bên thứ ba."
+                }
+            },
+            3: {
+                "non-it": {
+                    title: "🔰 Bản Hướng Dẫn cho Non-IT: Gọi API & Tính Latency",
+                    analogy: `
+                        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl space-y-2">
+                            <strong>💡 Ẩn dụ thực tế giúp bạn dễ hiểu:</strong>
+                            <p class="text-xs leading-relaxed">
+                                Hãy ví <strong>Latency (Độ trễ)</strong> giống như <strong>thời gian từ lúc bạn đặt trà sữa trên ứng dụng cho đến khi shipper giao hàng tới cửa</strong>. 
+                                Còn **API Request** là thao tác bấm nút đặt đơn. Đo đạc Latency giúp bạn biết tốc độ phục vụ của hệ thống nhanh hay chậm để có kế hoạch tối ưu trải nghiệm khách hàng.
+                            </p>
+                        </div>
+                    `,
+                    steps: [
+                        "<strong>Mở đồng hồ bấm giờ (Bắt đầu):</strong> Đặt một mốc thời gian ngay trước khi gửi câu hỏi tới AI (Request).",
+                        "<strong>Gửi câu hỏi và đợi AI trả lời:</strong> Thực hiện gọi API để gửi tin nhắn đến GPT-4o.",
+                        "<strong>Bấm dừng đồng hồ (Kết thúc):</strong> Lấy mốc thời gian sau khi nhận được câu trả lời từ AI, sau đó lấy mốc Kết thúc trừ mốc Bắt đầu để ra tổng số giây trễ."
+                    ],
+                    whyBox: "<strong>Tại sao phải làm việc này?</strong><br>Đo lường độ trễ giúp bạn biết được hệ thống AI phản hồi mất bao nhiêu giây. Từ đó, bạn có thể thiết kế các giao diện như vòng xoay chờ đợi (Loading spinner) để người dùng không cảm thấy sốt ruột."
+                },
+                "it": {
+                    title: "💻 Technical Deep-Dive & Best Practices: Latency & Performance",
+                    technicalFocus: `
+                        <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl space-y-2 font-mono text-[11px]">
+                            <strong>⚡ TECHNICAL SPECS & ARCHITECTURE:</strong>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Timing Precision: Use 'time.perf_counter()' rather than 'time.time()'. It provides the highest available resolution sleep-independent timer.</li>
+                                <li>Latency Metrics: Capture TTFT (Time to First Token) vs Complete Response Latency.</li>
+                                <li>Asynchronous calls: Recommend using asyncio client ('AsyncOpenAI') for production concurrent connections.</li>
+                            </ul>
+                        </div>
+                    `,
+                    codeSnippet: `
+                        <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-slate-300 font-mono text-[11px] space-y-1.5 text-left">
+                            <span class="text-slate-500 block text-xs mb-1">// Measuring call latency securely:</span>
+                            <div class="text-slate-300">
+                                <span class="text-orange-400">import</span> time<br>
+                                <span class="text-slate-500"># Start high-resolution timer</span><br>
+                                t0 = time.perf_counter()<br><br>
+                                response = client.chat.completions.create(<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;model=<span class="text-green-400">"gpt-4o"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;messages=[{<span class="text-green-400">"role"</span>: <span class="text-green-400">"user"</span>, <span class="text-green-400">"content"</span>: <span class="text-green-400">"Hello!"</span>}]<br>
+                                )<br><br>
+                                <span class="text-slate-500"># Stop timer</span><br>
+                                latency = time.perf_counter() - t0<br>
+                                print(<span class="text-green-400">f"API latency: {latency:.4f} seconds"</span>)
+                            </div>
+                        </div>
+                    `,
+                    optimization: "<strong>Tối ưu hóa & Bảo mật:</strong><br>1. <strong>Network Latency:</strong> Độ trễ phụ thuộc lớn vào khoảng cách vật lý đến datacenter OpenAI. Cân nhắc sử dụng Streaming (`stream=True`) để giảm TTFT đáng kể xuống dưới 500ms.<br>2. <strong>Retry with Backoff:</strong> Sử dụng cơ chế lũy kế thời gian chờ khi gặp lỗi mạng (HTTP 429 - Rate Limit hoặc HTTP 503)."
+                }
+            }
+        };
+
+        function restoreOriginalGuide() {
+            currentPersonalizedMode = 'original';
+            setActiveStep(currentActiveStep);
+        }
+
+        function generateNonITGuide() {
+            currentPersonalizedMode = 'non-it';
+            const chatBox = document.getElementById('chat-box');
+            const userMsg = document.createElement('div');
+            userMsg.className = "bg-orange-50 border border-orange-200 p-2.5 rounded-xl text-slate-800 ml-6 text-right shadow-sm";
+            userMsg.innerHTML = `<span class="text-[10px] text-orange-600 block mb-0.5">Hệ thống:</span> 🔰 Yêu cầu sinh Bản Hướng Dẫn cho Non-IT cho tất cả các bước`;
+            chatBox.appendChild(userMsg);
+
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm";
+                aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>Đã chuyển toàn bộ tài liệu Codelab sang Bản hướng dẫn Non-IT trực quan! Khi bạn chọn các bước khác ở Sidebar bên trái, nội dung Non-IT tương ứng sẽ tự động hiển thị.</div>`;
+                chatBox.appendChild(aiMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 400);
+
+            renderPersonalizedGuide('non-it', currentActiveStep);
+        }
+
+        function generateITGuide() {
+            currentPersonalizedMode = 'it';
+            const chatBox = document.getElementById('chat-box');
+            const userMsg = document.createElement('div');
+            userMsg.className = "bg-orange-50 border border-orange-200 p-2.5 rounded-xl text-slate-800 ml-6 text-right shadow-sm";
+            userMsg.innerHTML = `<span class="text-[10px] text-orange-600 block mb-0.5">Hệ thống:</span> 💻 Yêu cầu sinh Bản Hướng Dẫn cho IT cho tất cả các bước`;
+            chatBox.appendChild(userMsg);
+
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm";
+                aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>Đã chuyển toàn bộ tài liệu Codelab sang Bản hướng dẫn Technical Deep-dive cho IT! Khi bạn chọn các bước khác ở Sidebar bên trái, nội dung IT tương ứng sẽ tự động hiển thị.</div>`;
+                chatBox.appendChild(aiMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 400);
+
+            renderPersonalizedGuide('it', currentActiveStep);
+        }
+
+        function renderPersonalizedGuide(type, stepNum) {
+            let stepData = personalizedGuides[stepNum];
+            if (!stepData) {
+                const titleText = codelabSteps[stepNum] ? codelabSteps[stepNum].title : `Bước ${stepNum}`;
+                stepData = {
+                    "non-it": {
+                        title: `🔰 Bản Hướng Dẫn cho Non-IT: ${titleText}`,
+                        analogy: `
+                            <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl space-y-2">
+                                <strong>💡 Ẩn dụ thực tế của phần này:</strong>
+                                <p class="text-xs leading-relaxed">
+                                    Thực hiện các thao tác cấu hình của ${titleText} giống như cách bạn sắp xếp nguyên liệu và hướng dẫn các phụ bếp cùng làm việc theo một quy trình thống nhất trong một bếp ăn công nghiệp.
+                                </p>
+                            </div>
+                        `,
+                        steps: [
+                            "<strong>Đọc kỹ tài liệu mô tả:</strong> Đảm bảo nắm bắt được luồng dữ liệu trước khi thay đổi.",
+                            "<strong>Chạy các câu lệnh tương tác:</strong> Thực hiện viết code/cấu hình theo từng phần nhỏ.",
+                            "<strong>Kiểm thử kết quả:</strong> Chạy thử mã nguồn trên máy của bạn để xem kết quả trực quan."
+                        ],
+                        whyBox: "<strong>Tại sao phải làm bước này?</strong><br>Hoàn thiện từng bước nhỏ giúp bạn kiểm soát lỗi dễ dàng hơn và xây dựng một hệ thống hoàn thiện, vững chắc."
+                    },
+                    "it": {
+                        title: `💻 Technical Deep-Dive for IT Specialist: ${titleText}`,
+                        technicalFocus: `
+                            <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl space-y-2 font-mono text-[11px]">
+                                <strong>⚡ TECHNICAL SPECS & ARCHITECTURE:</strong>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Integration: Follow structural patterns defined in template code.</li>
+                                    <li>Error Handling: Wrap calls in try/except blocks to catch HTTP response anomalies.</li>
+                                    <li>Configuration: Store environment variables and run isolated tests.</li>
+                                </ul>
+                            </div>
+                        `,
+                        codeSnippet: `
+                            <div class="bg-slate-900 border border-slate-800 p-3 rounded-lg text-slate-300 font-mono text-[11px] space-y-1.5 text-left">
+                                <span class="text-slate-500 block text-xs mb-1">// Implement code block for ${titleText}:</span>
+                                <div class="text-slate-300">
+                                    <span class="text-orange-400">try</span>:<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-slate-500"># Code block implementation</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;pass<br>
+                                    <span class="text-orange-400">except</span> <span class="text-blue-400">Exception</span> <span class="text-orange-400">as</span> e:<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;print(<span class="text-green-400">f"Error occurred: {e}"</span>)
+                                </div>
+                            </div>
+                        `,
+                        optimization: "<strong>Tối ưu hóa & Bảo mật:</strong><br>Đảm bảo tuân thủ các nguyên tắc thiết kế mã nguồn sạch (Clean Code), viết các câu lệnh kiểm thử tự động, tránh lưu khóa bảo mật trong file code và tối ưu hóa tài nguyên mạng khi gọi API."
+                    }
+                };
+            }
+
+            const guide = stepData[type];
+            const mainContent = document.getElementById('main-content-area');
+
+            let html = `
+                <div class="space-y-6">
+                    <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Bản hướng dẫn cá nhân hóa (Bước ${stepNum})</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">${guide.title}</h2>
+                        </div>
+                        <button onclick="restoreOriginalGuide()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-medium shadow-sm">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> Quay lại bản gốc
+                        </button>
+                    </div>
+            `;
+
+            if (type === 'non-it') {
+                let stepsListHtml = guide.steps.map((st, idx) => `
+                    <div class="flex items-start space-x-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                        <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs shrink-0 mt-0.5">${idx + 1}</div>
+                        <span class="text-xs text-slate-600 leading-relaxed">${st}</span>
+                    </div>
+                `).join('');
+
+                html += `
+                    ${guide.analogy}
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-route text-emerald-600"></i> Các bước thực hiện chi tiết:
+                        </h3>
+                        <div class="space-y-2.5">
+                            ${stepsListHtml}
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-xs leading-relaxed shadow-sm">
+                        ${guide.whyBox}
+                    </div>
+                `;
+            } else {
+                html += `
+                    ${guide.technicalFocus}
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-code text-indigo-600"></i> Code Snippet tiêu chuẩn:
+                        </h3>
+                        ${guide.codeSnippet}
+                    </div>
+
+                    <div class="p-4 bg-white border border-slate-200 text-slate-700 rounded-xl text-xs leading-relaxed shadow-sm">
+                        ${guide.optimization}
+                    </div>
+                `;
+            }
+
+            html += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-book-bookmark text-orange-600"></i> Khái niệm trọng tâm (Bấm để Agent giải thích):
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <button onclick="askAgentExplain('Khái niệm: Latency trong LLM')"
+                                class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
+                                <div class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
+                                    <span>Latency (Độ trễ)</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                                </div>
+                                <div class="text-slate-500 mt-1 text-[11px]">Thời gian từ khi gửi prompt đến khi nhận câu trả lời.</div>
+                            </button>
+
+                            <button onclick="askAgentExplain('Khái niệm: Temperature')"
+                                class="p-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-200 rounded-lg text-left transition group">
+                                <div class="font-bold text-orange-600 group-hover:text-orange-500 flex items-center justify-between">
+                                    <span>Temperature</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                                </div>
+                                <div class="text-slate-500 mt-1 text-[11px]">Tham số điều chỉnh mức độ ngẫu nhiên/sáng tạo của model.</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            mainContent.innerHTML = html;
+        }
+
+        // Call on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStepSidebar();
+            setActiveStep(1);
+        });
     </script>
+    <!-- Floating AI Bubble (shown when chatbox is collapsed) -->
+    <button id="ai-bubble" onclick="toggleAgentPanel()"
+        class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-orange-600 to-amber-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-orange-500/40 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer z-50 group hidden hover:shadow-orange-500/60 focus:outline-none">
+        <i class="fa-solid fa-robot text-xl animate-pulse"></i>
+        <!-- Tooltip -->
+        <span
+            class="absolute right-16 bg-slate-900 border border-slate-850 text-slate-100 text-xs px-3 py-1.5 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none whitespace-nowrap">
+            Hỏi AI Tutor
+        </span>
+    </button>
 </body>
 
 </html>
