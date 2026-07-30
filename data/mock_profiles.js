@@ -1,4 +1,4 @@
-{
+const MOCK_PROFILES_DATA = {
   "schemaVersion": "1.0",
   "generatedAt": "2026-07-30T00:00:00+07:00",
   "description": "Mock data giả lập hồ sơ năng lực, không đại diện cho người thật.",
