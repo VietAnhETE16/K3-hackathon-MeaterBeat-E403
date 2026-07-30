@@ -8,8 +8,8 @@
 | :--- | :---: | :--- | :--- |
 | **Mai Việt Anh** | `2A202601083` | **Developer (Flow Build)** | Phát triển logic điều hướng Codelab, tích hợp API OpenAI thật cho Dual-Mode, quản lý cache hướng dẫn. |
 | **Trương Đình Khoa** | `2A202601297` | **Developer (Flow Build)** | Lập trình giao diện Chat Overlay Widget, thuật toán phân chia role nhóm và render Interactive Checklist. |
-| **Nguyễn Trọng Dũng** | `2A202601965` | **Prompt & QA Engineer** | Soạn thảo các system prompt (anti-injection, IT/Non-IT, chia role), xây dựng Golden Set, chạy evaluate.js. |
-| **Lương Đăng Doanh** | `2A202601209` | **Product Analyst (Spec & Val)** | Lập kế hoạch thử nghiệm người dùng (validation), thu thập feedback log. |
+| **Lương Đăng Doanh** | `2A202601209` | **Prompt & QA Engineer** | Soạn thảo các system prompt (anti-injection, IT/Non-IT, chia role), xây dựng Golden Set, chạy evaluate.js. |
+| **Nguyễn Trọng Dũng** | `2A202601965` | **Product Analyst (Spec & Val)** | Lập kế hoạch thử nghiệm người dùng (validation), thu thập feedback log. |
 | **Trần Tuấn Trung** | `2A202601769` | **BA & PM (Survey & Pain Point)** | Thực hiện khảo sát (84 người), phân tích số liệu tìm pain point và quản trị mục tiêu. |
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
