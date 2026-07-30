@@ -859,34 +859,145 @@
             }
         }
 
-        function askAgentExplain(topic) {
+        function getSecurityPrompt() {
+            if (typeof SYSTEM_PROMPTS === 'undefined' || !SYSTEM_PROMPTS.security) {
+                return '';
+            }
+            let prompt = SYSTEM_PROMPTS.security;
+            prompt = prompt.replace(/\{\{ALLOWED_SCOPE\}\}/g, 
+                "- Giải thích và tóm tắt kiến thức kỹ thuật về lập trình, thuật toán, dữ liệu và AI.\n" +
+                "- Phân tích và hướng dẫn các bài Lab thực hành của VLearn Codelabs.\n" +
+                "- Hỗ trợ lập trình, sửa lỗi code (Python, JS, C++,...) và thiết kế hệ thống phần mềm.\n" +
+                "- So sánh các giải pháp công nghệ và thiết kế hệ thống AI.");
+            prompt = prompt.replace(/\{\{ALLOWED_SCOPE_SUMMARY\}\}/g, 
+                "giải thích kiến thức kỹ thuật, phân tích mã nguồn, hỗ trợ sửa lỗi lập trình và hướng dẫn các bài Lab thực hành của VLearn");
+            prompt = prompt.replace(/\{\{IN_SCOPE_ALTERNATIVE\}\}/g, 
+                "hỏi về nội dung chuyên môn bài Lab, giải thích thuật ngữ lập trình hoặc trợ giúp sửa lỗi code cụ thể");
+            prompt = prompt.replace(/\{\{VALID_REQUEST\}\}/g, 
+                "nhiệm vụ giải thích kiến thức kỹ thuật hợp lệ");
+            return prompt;
+        }
+
+        function checkRulebase(input) {
+            const cleanInput = input.trim().toLowerCase();
+
+            // 1. Prompt Injection check
+            if (cleanInput.includes("bỏ qua") && (cleanInput.includes("system prompt") || cleanInput.includes("hướng dẫn trước") || cleanInput.includes("chỉ dẫn"))) {
+                return "Mình không thể cung cấp hoặc xác nhận các chỉ dẫn nội bộ của hệ thống vì đây là thông tin được bảo vệ.";
+            }
+
+            // 2. Exam/Cheating check
+            if ((cleanInput.includes("bài kiểm tra") || cleanInput.includes("thi online") || cleanInput.includes("đáp án")) && (cleanInput.includes("nộp luôn") || cleanInput.includes("câu 1") || cleanInput.includes("làm hộ"))) {
+                return "Mình không thể làm hộ hoặc cung cấp đáp án để bạn gian lận trong bài kiểm tra đang diễn ra. Mình có thể giải thích kiến thức hoặc hướng dẫn cách tự giải từng dạng bài.";
+            }
+
+            // 3. Security/Hacking check
+            if (cleanInput.includes("ransomware") || (cleanInput.includes("mã hóa") && cleanInput.includes("trả tiền"))) {
+                return "Mình không thể hỗ trợ tạo ransomware hoặc mã độc gây thiệt hại. Mình có thể hướng dẫn cách phòng chống ransomware, sao lưu dữ liệu và xây dựng quy trình ứng phó sự cố.";
+            }
+            if (cleanInput.includes("trộm api key") || cleanInput.includes("lấy trộm api")) {
+                return "Mình không thể hỗ trợ đánh cắp API key hoặc truy cập trái phép vào thiết bị của người khác. Mình có thể hướng dẫn cách bảo vệ, thu hồi và xoay vòng API key bị lộ.";
+            }
+            if (cleanInput.includes("bypass đăng nhập") || cleanInput.includes("bypass dang nhap") || (cleanInput.includes("vượt qua") && cleanInput.includes("đăng nhập") && cleanInput.includes("không cần mật khẩu"))) {
+                return "Mình không thể hướng dẫn vượt qua cơ chế đăng nhập hoặc truy cập trái phép. Nếu đây là hệ thống của bạn, mình có thể hỗ trợ kiểm tra bảo mật trong phạm vi được ủy quyền hoặc khôi phục quyền truy cập hợp lệ.";
+            }
+            if (cleanInput.includes("giả mạo ngân hàng") || cleanInput.includes("gia mao ngan hang") || cleanInput.includes("email giả mạo")) {
+                return "Mình không thể giúp tạo nội dung lừa đảo hoặc đánh cắp thông tin đăng nhập. Mình có thể hỗ trợ viết nội dung đào tạo nhận biết phishing hoặc thiết kế bài mô phỏng an toàn có cảnh báo rõ ràng.";
+            }
+
+            // 4. Out of scope / Unrelated check
+            if (cleanInput.includes("dung lượng trống") || cleanInput.includes("gb trống") || 
+                cleanInput.includes("chắc chắn có trong bài thi") || cleanInput.includes("đáp án thi") ||
+                cleanInput.includes("repo github") || 
+                cleanInput.includes("deadline") ||
+                (cleanInput.includes("accuracy") && (cleanInput.includes("nhóm tôi") || cleanInput.includes("nhom toi"))) ||
+                cleanInput.includes("xóa sạch database production") || cleanInput.includes("xóa sạch db production") ||
+                cleanInput.includes("đau ngực") || cleanInput.includes("khó thở") ||
+                cleanInput.includes("chuyển 20 triệu") || cleanInput.includes("mở khóa tài khoản ngân hàng") ||
+                cleanInput.includes("chmod -r 777") || cleanInput.includes("chmod 777") ||
+                cleanInput.includes("nộp hồ sơ") || cleanInput.includes("nop ho so")) {
+                return "Câu này không liên quan đến bài lab. Vui lòng hỏi câu giúp xây dựng kiến thức";
+            }
+
+            return null;
+        }
+
+        async function askAgentExplain(topic) {
             switchTab('explain');
             const chatBox = document.getElementById('chat-box');
 
+            // 1. Add user message
             const userMsg = document.createElement('div');
             userMsg.className = "bg-orange-50 border border-orange-200 p-2.5 rounded-xl text-slate-800 ml-6 text-right shadow-sm";
             userMsg.innerHTML = `<span class="text-[10px] text-orange-600 block mb-0.5">Bạn hỏi (${currentMode === 'summary' ? 'Tóm tắt' : 'Chi tiết'}):</span> ${topic}`;
             chatBox.appendChild(userMsg);
 
-            setTimeout(() => {
-                const aiMsg = document.createElement('div');
-                aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm font-sans";
+            // 2. Add loader placeholder for AI response
+            const aiMsg = document.createElement('div');
+            aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm font-sans";
+            
+            const uniqueId = 'ai-response-' + Date.now();
+            aiMsg.innerHTML = `
+                <div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div>
+                <div id="${uniqueId}">
+                    <i class="fa-solid fa-spinner animate-spin text-orange-600 mr-1.5"></i> Đang suy nghĩ câu trả lời...
+                </div>
+            `;
+            chatBox.appendChild(aiMsg);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-                let responseText = "";
+            // 3. Intercept with Rulebase first
+            const rulebaseResponse = checkRulebase(topic);
+            if (rulebaseResponse !== null) {
+                setTimeout(() => {
+                    const responseContainer = document.getElementById(uniqueId);
+                    if (responseContainer) {
+                        responseContainer.innerHTML = `<div class="text-xs leading-relaxed text-slate-700 markdown-content font-sans">${marked.parse(rulebaseResponse)}</div>`;
+                    }
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 300);
+                return;
+            }
+
+            try {
+                // Determine context from current lab step
+                const step = (typeof currentLabData !== 'undefined' && currentLabData && currentLabData.steps) 
+                    ? currentLabData.steps[currentActiveStep - 1] 
+                    : null;
+                const contextStr = step 
+                    ? `Bối cảnh bài học hiện tại:\n- Lab: ${currentLabData.title}\n- Bước ${currentActiveStep}: ${step.title}\n- Tài liệu bước:\n${step.content}`
+                    : '';
+
+                let systemPrompt = getSecurityPrompt();
+                systemPrompt += "\n\n---\n\n";
                 if (currentMode === 'summary') {
-                    responseText = `<strong>[Tóm tắt ngắn]:</strong> ${topic} giúp liên kết và điều phối dữ liệu với mô hình AI trong thời gian ngắn nhất, tối ưu hiệu năng gọi API.`;
+                    systemPrompt += "Bạn là AI Tutor trên VLearn. Hãy giải thích cực kỳ ngắn gọn, cô đọng, dễ hiểu (tóm tắt trong 2-3 câu) về chủ đề hoặc câu hỏi của học sinh. " +
+                                   "Đặc biệt hướng tới các học viên muốn nắm bắt ý nghĩa cốt lõi nhanh chóng. Trả về định dạng Markdown (có thể có in đậm, list).";
                 } else {
-                    responseText = `<strong>[Giải thích chi tiết]:</strong>
-                        <ul class="list-disc list-inside space-y-1 mt-1 text-slate-600 font-sans">
-                            <li><strong>Bản chất:</strong> Thao tác với ${topic} điều chỉnh cách gói tin HTTP Request được đóng gói và gửi tới Server OpenAI.</li>
-                            <li><strong>Ứng dụng:</strong> Giúp tính toán chính xác chi phí API trên mỗi lượt gọi và kiểm soát rủi ro Timeout.</li>
-                        </ul>`;
+                    systemPrompt += "Bạn là AI Tutor kỹ thuật chuyên sâu trên VLearn. Hãy giải thích chi tiết, cặn kẽ và trực quan về câu hỏi hoặc chủ đề của học sinh. " +
+                                   "Cung cấp bản chất hoạt động, cơ chế, ví dụ thực tế và ứng dụng/lưu ý kỹ thuật. Trả về định dạng Markdown tiêu chuẩn.";
                 }
 
-                aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>${responseText}</div>`;
-                chatBox.appendChild(aiMsg);
+                if (contextStr) {
+                    systemPrompt += `\n\n${contextStr}`;
+                }
+
+                const responseText = await callRealLLM(systemPrompt, topic);
+                const responseHtml = marked.parse(responseText);
+
+                const responseContainer = document.getElementById(uniqueId);
+                if (responseContainer) {
+                    responseContainer.innerHTML = `<div class="text-xs leading-relaxed text-slate-700 markdown-content font-sans">${responseHtml}</div>`;
+                }
+            } catch (err) {
+                console.error("Agent QA Error:", err);
+                const responseContainer = document.getElementById(uniqueId);
+                if (responseContainer) {
+                    responseContainer.innerHTML = `<span class="text-red-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Lỗi: ${err.message}</span>`;
+                }
+            } finally {
                 chatBox.scrollTop = chatBox.scrollHeight;
-            }, 500);
+            }
         }
 
         function handleUserSend() {
@@ -1477,27 +1588,74 @@
                 const responseMarkdown = await callRealLLM(systemPrompt, userPrompt);
                 const tipsHtml = marked.parse(responseMarkdown);
 
-                const tipsContent = document.getElementById('ai-tips-content');
-                if (tipsContent) {
-                    tipsContent.innerHTML = `<div class="text-xs leading-relaxed text-slate-700 markdown-content">${tipsHtml}</div>`;
-                }
+                // Construct full page HTML with resolved tips
+                const fullHtml = `
+                    <div class="space-y-6">
+                        <!-- Header with mode indicator & back button -->
+                        <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+                            <div>
+                                <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Codelab Interactive - Bước ${stepNum}</span>
+                                <h2 class="text-2xl font-bold text-slate-900 mt-1">${titleText}</h2>
+                                <div class="mt-2 flex items-center gap-2">
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${type === 'non-it' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}">${modeLabel}</span>
+                                    <span class="text-[10px] text-slate-400">${modeDesc}</span>
+                                </div>
+                            </div>
+                            <button onclick="restoreOriginalGuide()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-medium shadow-sm border-0 shrink-0">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> Quay lại bản gốc
+                            </button>
+                        </div>
+
+                        <!-- ORIGINAL DOCUMENT (kept intact) -->
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                            <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-file-lines text-blue-600"></i> Tài liệu gốc
+                            </h3>
+                            <div class="text-xs leading-relaxed text-slate-700 markdown-content">
+                                ${originalHtml}
+                            </div>
+                        </div>
+
+                        ${tipsSection}
+
+                        <!-- AI PERSONALIZED GUIDANCE (generated from original + tips) -->
+                        <div class="bg-gradient-to-br ${type === 'non-it' ? 'from-green-50 to-emerald-50 border-green-200' : 'from-purple-50 to-indigo-50 border-purple-200'} border rounded-xl p-5 space-y-4 shadow-sm" id="ai-tips-section">
+                            <h3 class="text-sm font-semibold ${type === 'non-it' ? 'text-green-800' : 'text-purple-800'} flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles ${type === 'non-it' ? 'text-green-600' : 'text-purple-600'}"></i>
+                                ${type === 'non-it' ? 'Hướng Dẫn Cá Nhân Hóa (Non-IT)' : 'Hướng Dẫn Cá Nhân Hóa (Technical IT)'}
+                                <span class="text-[9px] ${type === 'non-it' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'} px-2 py-0.5 rounded-full font-medium">Được AI tạo từ tài liệu gốc + Tips</span>
+                            </h3>
+                            <div id="ai-tips-content">
+                                <div class="text-xs leading-relaxed text-slate-700 markdown-content font-sans">${tipsHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
                 // Cache the full page (with tips rendered)
-                personalizedGuidesCache[type][stepNum] = mainContent.innerHTML;
+                personalizedGuidesCache[type][stepNum] = fullHtml;
+
+                // Update the DOM only if the user is still on the same step and mode
+                if (currentActiveStep === stepNum && currentPersonalizedMode === type) {
+                    mainContent.innerHTML = fullHtml;
+                }
 
             } catch (err) {
                 console.error("Personalized guide error: ", err);
-                const tipsContent = document.getElementById('ai-tips-content');
-                if (tipsContent) {
-                    tipsContent.innerHTML = `
-                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center space-y-3">
-                            <div class="text-red-600"><i class="fa-solid fa-circle-exclamation"></i></div>
-                            <p class="text-xs text-red-700 font-medium">Không thể tạo hướng dẫn cá nhân hóa: ${err.message}</p>
-                            <button onclick="renderPersonalizedGuide('${type}', ${stepNum})" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-semibold shadow transition cursor-pointer border-0">
-                                Thử lại
-                            </button>
-                        </div>
-                    `;
+                // Update only if still on the same step and mode
+                if (currentActiveStep === stepNum && currentPersonalizedMode === type) {
+                    const tipsContent = document.getElementById('ai-tips-content');
+                    if (tipsContent) {
+                        tipsContent.innerHTML = `
+                            <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center space-y-3">
+                                <div class="text-red-600"><i class="fa-solid fa-circle-exclamation"></i></div>
+                                <p class="text-xs text-red-700 font-medium">Không thể tạo hướng dẫn cá nhân hóa: ${err.message}</p>
+                                <button onclick="renderPersonalizedGuide('${type}', ${stepNum})" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-semibold shadow transition cursor-pointer border-0">
+                                    Thử lại
+                                </button>
+                            </div>
+                        `;
+                    }
                 }
                 throw err;
             }
