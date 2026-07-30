@@ -119,14 +119,14 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | :--- | :---: | :--- | :--- |
 | **Mai Việt Anh** | `2A202601083` | **Developer (Flow Build)** | Phát triển logic điều hướng Codelab, tích hợp API OpenAI thật cho Dual-Mode, quản lý cache hướng dẫn. |
 | **Trương Đình Khoa** | `2A202601297` | **Developer (Flow Build)** | Lập trình giao diện Chat Overlay Widget, thuật toán phân chia role nhóm và render Interactive Checklist. |
-| **Nguyễn Trọng Dũng** | `2A202601965` | **Prompt & QA Engineer** | Soạn thảo các system prompt (anti-injection, IT/Non-IT, chia role), xây dựng Golden Set, chạy evaluate.js. |
-| **Lương Đăng Doanh** | `2A202601209` | **Product Analyst (Spec & Val)** | Lập kế hoạch thử nghiệm người dùng (validation), thu thập feedback log. |
+| **Lương Đăng Doanh** | `2A202601209` | **Prompt & QA Engineer** | Soạn thảo các system prompt (anti-injection, IT/Non-IT, chia role), xây dựng Golden Set, chạy evaluate.js. |
+| **Nguyễn Trọng Dũng** | `2A202601965` | **Product Analyst (Spec & Val)** | Lập kế hoạch thử nghiệm người dùng (validation), thu thập feedback log. |
 | **Trần Tuấn Trung** | `2A202601769` | **BA & PM (Survey & Pain Point)** | Thực hiện khảo sát (84 người), phân tích số liệu tìm pain point và quản trị mục tiêu. |
 
-<!-- - **Willing users (3 học viên ngoài nhóm):**
-  1. Nguyễn Văn An (Lớp K3 AI Thực Chiến) - Thử nghiệm chế độ dịch Non-IT.
-  2. Phạm Minh Đức (Lớp K3 AI Thực Chiến) - Thử nghiệm tính năng phân chia role nhóm.
-  3. Hoàng Thị Lan (Lớp K3 AI Thực Chiến) - Thử nghiệm kịch bản hỏi đáp lỗi.
+- **Willing users (ngoài nhóm):**
+  1. Nguyễn Minh Anh (Labcoach) - Thử nghiệm chế độ dịch Non-IT.
+  2. Hoàng Hiệp (Labcoach) - Thử nghiệm tính năng phân chia role nhóm.
+  3. Võ Huyền Khánh Mây (Labcoach) - Thử nghiệm kịch bản hỏi đáp lỗi.
 - **Kế hoạch Validation vòng CP5:**
   - Chạy thử nghiệm trực tiếp 10 phút/người. Cho học viên thực hiện task cụ thể. TA hoặc thành viên nhóm quan sát, ghi chép hành vi và hỏi 3 câu hỏi trải nghiệm để ghi log vào `validation/user_validation_log.json`.
 
@@ -136,4 +136,4 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 | :--- | :--- | :--- |
 | **30/07/2026 17:00** | Cấu hình System Prompt chặn cứng y tế, tài chính, logistics | Tránh rủi ro pháp lý và nâng cao tính an toàn của mô hình đối với các câu hỏi ngoài phạm vi (ID 26, 27, 28, 29, 30). |
-| **30/07/2026 17:15** | Tích hợp dữ liệu khảo sát thực tế (84 phản hồi) vào Spec | Bổ sung bằng chứng định lượng thực tế để chứng minh tính thuyết phục của bài toán phân chia vai trò nhóm. | -->
+| **30/07/2026 17:15** | Tích hợp dữ liệu khảo sát thực tế (84 phản hồi) vào Spec | Bổ sung bằng chứng định lượng thực tế để chứng minh tính thuyết phục của bài toán phân chia vai trò nhóm. |
