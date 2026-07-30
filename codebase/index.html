@@ -350,6 +350,54 @@
 
                     <!-- TAB 2: CHỨC NĂNG 2 - CHỌN HỌC VIÊN TỪ DROPLIST & CHIA ROLE -->
                     <div id="tab-role" class="flex-1 flex flex-col overflow-y-auto p-4 space-y-4 text-xs hidden">
+                        <!-- Add New Student Section -->
+                        <div class="space-y-3 text-left">
+                            <button onclick="toggleAddStudentForm()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer border-0">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Thêm học viên</span>
+                            </button>
+                            <div id="add-student-form" class="hidden bg-white border border-slate-200 p-3.5 rounded-xl space-y-3 shadow-sm">
+                                <div class="font-bold text-slate-800 flex items-center justify-between">
+                                    <span>Hồ sơ năng lực</span>
+                                    <span id="next-student-id-badge" class="text-[10px] bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded font-mono font-medium">MP----</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500">Các trường đánh dấu <span class="text-red-500">*</span> là bắt buộc.</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" id="new-student-name" placeholder="Tên học viên *" class="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition">
+                                    <input type="email" id="new-student-email" placeholder="Email (tùy chọn)" class="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition">
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-700 mb-2">Kỹ năng <span class="text-red-500">*</span> <span class="font-normal text-slate-400">— chọn rồi tự đánh giá mức độ 1–5</span></div>
+                                    <div id="new-student-skill-groups" class="space-y-3"></div>
+                                </div>
+                                <div id="new-student-skill-levels" class="hidden border border-slate-200 rounded-xl p-3 space-y-3 bg-slate-50"></div>
+                                <div>
+                                    <div class="font-bold text-slate-700 mb-2">Vai trò mong muốn <span class="text-red-500">*</span> <span class="font-normal text-slate-400">— chọn nhiều</span></div>
+                                    <div id="new-student-role-options" class="flex flex-wrap gap-2"></div>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-700 mb-2">Lĩnh vực quan tâm <span class="text-red-500">*</span> <span class="font-normal text-slate-400">— chọn nhiều</span></div>
+                                    <div id="new-student-interest-options" class="flex flex-wrap gap-2"></div>
+                                </div>
+                                <div>
+                                    <label for="new-student-industry" class="font-bold text-slate-700 mb-2 block">Ngành đang công tác</label>
+                                    <select id="new-student-industry" class="bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 focus:outline-none focus:border-orange-500 transition">
+                                        <option value="">Ngành hiện tại</option>
+                                    </select>
+                                </div>
+                                <textarea id="new-student-notes" rows="2" maxlength="300" placeholder="Ghi chú năng lực / availability (tùy chọn)" class="w-full resize-y bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition"></textarea>
+                                <div id="add-student-status" class="hidden rounded-lg px-3 py-2 text-[11px]" role="status"></div>
+                                <button onclick="addNewStudentProfile()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer border-0">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Thêm học viên</span>
+                                </button>
+                                <button onclick="toggleAddStudentForm()" class="w-full bg-white hover:bg-slate-50 text-slate-650 border border-slate-200 font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer">
+                                    <i class="fa-solid fa-chevron-up"></i>
+                                    <span>Thu nhỏ</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Droplist & Search Student Section -->
                         <div class="bg-white border border-slate-200 p-3.5 rounded-xl space-y-3 shadow-sm text-left">
                             <div class="font-bold text-slate-800 flex items-center justify-between">
@@ -473,6 +521,8 @@
     <script>
         // State variables
         let mockDatabase = {}; // Loaded from data/mock_profiles.json
+        let mockProfilesData = null;
+        const mockProfilesStorageKey = 'vlearn_mock_profiles_json';
         const fallbackDatabase = {
             "20233827": {
                 id: "20233827",
@@ -523,6 +573,10 @@
         };
 
         let selectedTeam = [];
+        let isAddStudentFormOpen = false;
+        const newStudentSkillLevels = {};
+        const newStudentDesiredRoles = new Set();
+        const newStudentInterests = new Set();
         let currentMode = 'summary';
         let currentActiveStep = 1;
         let currentPersonalizedMode = 'original'; // 'original', 'non-it', 'it'
@@ -628,12 +682,29 @@
         // Load JSON Profiles Asynchronously on boot
         async function loadStudentProfiles() {
             const statusBadge = document.getElementById('db-status-badge');
+
+            try {
+                const apiResponse = await fetch('/api/profiles');
+                if (apiResponse.ok) {
+                    const apiData = await apiResponse.json();
+                    if (apiData && apiData.profiles) {
+                        parseProfiles(apiData);
+                        if (statusBadge) {
+                            statusBadge.innerText = `File DB (${mockProfilesData.profiles.length} profiles)`;
+                            statusBadge.parentElement.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium";
+                        }
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('Profile API is not available. Loading static profile data.', err);
+            }
             
             // Check if mock_profiles.js is loaded locally to bypass CORS
             if (typeof MOCK_PROFILES_DATA !== 'undefined' && MOCK_PROFILES_DATA.profiles) {
-                parseProfiles(MOCK_PROFILES_DATA);
+                parseProfiles(getPersistedProfilesData(MOCK_PROFILES_DATA));
                 if (statusBadge) {
-                    statusBadge.innerText = `Online (${MOCK_PROFILES_DATA.profiles.length} profiles)`;
+                    statusBadge.innerText = `Online (${mockProfilesData.profiles.length} profiles)`;
                     statusBadge.parentElement.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium";
                 }
                 return;
@@ -644,9 +715,9 @@
                 if (!response.ok) throw new Error('Network response not ok');
                 const data = await response.json();
                 if (data && data.profiles) {
-                    parseProfiles(data);
+                    parseProfiles(getPersistedProfilesData(data));
                     if (statusBadge) {
-                        statusBadge.innerText = `Online (${data.total} profiles)`;
+                        statusBadge.innerText = `Online (${mockProfilesData.profiles.length} profiles)`;
                         statusBadge.parentElement.className = "bg-emerald-50 text-emerald-600 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium";
                     }
                 } else {
@@ -659,12 +730,35 @@
                     statusBadge.innerText = 'Local Fallback (5 profiles)';
                     statusBadge.parentElement.className = "bg-amber-50 text-amber-600 border border-amber-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium";
                 }
+                refreshNewStudentFormOptions();
             }
         }
 
+        function getPersistedProfilesData(baseData) {
+            try {
+                const savedText = localStorage.getItem(mockProfilesStorageKey);
+                if (!savedText) return baseData;
+                const savedData = JSON.parse(savedText);
+                if (savedData && Array.isArray(savedData.profiles)) {
+                    return savedData;
+                }
+            } catch (err) {
+                console.warn('Cannot read saved mock_profiles.json from localStorage.', err);
+            }
+            return baseData;
+        }
+
+        function saveProfilesData() {
+            if (!mockProfilesData || !Array.isArray(mockProfilesData.profiles)) return;
+            mockProfilesData.total = mockProfilesData.profiles.length;
+            mockProfilesData.generatedAt = new Date().toISOString();
+            localStorage.setItem(mockProfilesStorageKey, JSON.stringify(mockProfilesData));
+        }
+
         function parseProfiles(data) {
+            mockProfilesData = JSON.parse(JSON.stringify(data));
             mockDatabase = {};
-            data.profiles.forEach(p => {
+            mockProfilesData.profiles.forEach(p => {
                 const mappedSkills = p.skills.map(sk => {
                     let cat = 'eng';
                     const nameLower = sk.name.toLowerCase();
@@ -685,6 +779,300 @@
                     skills: mappedSkills
                 };
             });
+            refreshNewStudentFormOptions();
+            updateNextStudentIdBadge();
+        }
+
+        function flattenSkillCatalog() {
+            if (!mockProfilesData || !mockProfilesData.skillCatalog) return [];
+            return Object.values(mockProfilesData.skillCatalog).flat();
+        }
+
+        function fillSelectOptions(selectId, values, placeholder) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const currentValue = select.value;
+            select.innerHTML = `<option value="">${placeholder}</option>`;
+            values.forEach(value => {
+                const option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                select.appendChild(option);
+            });
+            if (values.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function refreshNewStudentFormOptions() {
+            if (!mockProfilesData) return;
+            fillSelectOptions('new-student-industry', mockProfilesData.industryOptions || [], 'Ngành hiện tại');
+            renderSkillCatalogButtons();
+            renderChoiceButtons('new-student-role-options', mockProfilesData.roleOptions || [], newStudentDesiredRoles, 'role');
+            renderChoiceButtons('new-student-interest-options', mockProfilesData.interestOptions || [], newStudentInterests, 'interest');
+            renderSelectedSkillLevels();
+        }
+
+        function toggleAddStudentForm() {
+            isAddStudentFormOpen = !isAddStudentFormOpen;
+            const form = document.getElementById('add-student-form');
+            if (!form) return;
+            form.classList.toggle('hidden', !isAddStudentFormOpen);
+            if (isAddStudentFormOpen) {
+                refreshNewStudentFormOptions();
+            }
+        }
+
+        function getChoiceButtonClass(isSelected) {
+            return isSelected
+                ? 'px-2.5 py-1.5 rounded-lg bg-orange-500 text-slate-950 border border-orange-500 text-[11px] font-semibold transition cursor-pointer'
+                : 'px-2.5 py-1.5 rounded-lg bg-white text-slate-650 border border-slate-200 hover:bg-slate-50 text-[11px] font-semibold transition cursor-pointer';
+        }
+
+        function renderSkillCatalogButtons() {
+            const container = document.getElementById('new-student-skill-groups');
+            if (!container || !mockProfilesData || !mockProfilesData.skillCatalog) return;
+
+            container.innerHTML = '';
+            Object.entries(mockProfilesData.skillCatalog).forEach(([groupName, skills]) => {
+                const group = document.createElement('div');
+                const buttons = skills.map(skillName => {
+                    const isSelected = Object.prototype.hasOwnProperty.call(newStudentSkillLevels, skillName);
+                    const icon = isSelected ? '<i class="fa-solid fa-check text-[10px] mr-1"></i>' : '';
+                    return `<button type="button" onclick="toggleNewStudentSkill('${escapeForAttribute(skillName)}')" class="${getChoiceButtonClass(isSelected)}">${icon}${skillName}</button>`;
+                }).join('');
+
+                group.innerHTML = `
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">${groupName}</div>
+                    <div class="flex flex-wrap gap-2">${buttons}</div>
+                `;
+                container.appendChild(group);
+            });
+        }
+
+        function renderChoiceButtons(containerId, values, selectedSet, type) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = values.map(value => {
+                const isSelected = selectedSet.has(value);
+                const icon = isSelected ? '<i class="fa-solid fa-check text-[10px] mr-1"></i>' : '';
+                return `<button type="button" onclick="toggleNewStudentChoice('${type}', '${escapeForAttribute(value)}')" class="${getChoiceButtonClass(isSelected)}">${icon}${value}</button>`;
+            }).join('');
+        }
+
+        function escapeForAttribute(value) {
+            return String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
+        function toggleNewStudentSkill(skillName) {
+            if (Object.prototype.hasOwnProperty.call(newStudentSkillLevels, skillName)) {
+                delete newStudentSkillLevels[skillName];
+            } else {
+                newStudentSkillLevels[skillName] = 3;
+            }
+            renderSkillCatalogButtons();
+            renderSelectedSkillLevels();
+        }
+
+        function updateNewStudentSkillLevel(skillName, level) {
+            if (Object.prototype.hasOwnProperty.call(newStudentSkillLevels, skillName)) {
+                newStudentSkillLevels[skillName] = Math.max(1, Math.min(5, Number(level) || 3));
+                renderSelectedSkillLevels();
+            }
+        }
+
+        function renderSelectedSkillLevels() {
+            const container = document.getElementById('new-student-skill-levels');
+            if (!container) return;
+
+            const entries = Object.entries(newStudentSkillLevels);
+            if (entries.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mức độ thành thạo (1 = cơ bản · 5 = chuyên gia)</div>
+                ${entries.map(([skillName, level]) => `
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[11px] font-semibold text-slate-700">${skillName}</span>
+                            <span class="text-orange-600 font-bold">${level}</span>
+                        </div>
+                        <input type="range" min="1" max="5" step="1" value="${level}" oninput="updateNewStudentSkillLevel('${escapeForAttribute(skillName)}', this.value)" class="w-full accent-orange-500 cursor-pointer">
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function toggleNewStudentChoice(type, value) {
+            const selectedSet = type === 'role' ? newStudentDesiredRoles : newStudentInterests;
+            if (selectedSet.has(value)) {
+                selectedSet.delete(value);
+            } else {
+                selectedSet.add(value);
+            }
+
+            if (type === 'role') {
+                renderChoiceButtons('new-student-role-options', mockProfilesData.roleOptions || [], newStudentDesiredRoles, 'role');
+            } else {
+                renderChoiceButtons('new-student-interest-options', mockProfilesData.interestOptions || [], newStudentInterests, 'interest');
+            }
+        }
+
+        function getNextStudentId() {
+            if (!mockProfilesData || !Array.isArray(mockProfilesData.profiles)) return 'MP0001';
+            const maxNumber = mockProfilesData.profiles.reduce((max, profile) => {
+                const match = String(profile.id || '').match(/^MP(\d+)$/);
+                return match ? Math.max(max, Number(match[1])) : max;
+            }, 0);
+            return `MP${String(maxNumber + 1).padStart(4, '0')}`;
+        }
+
+        function updateNextStudentIdBadge() {
+            const badge = document.getElementById('next-student-id-badge');
+            if (badge) {
+                badge.textContent = getNextStudentId();
+            }
+        }
+
+        function setAddStudentStatus(message, type = 'success') {
+            const status = document.getElementById('add-student-status');
+            if (!status) return;
+            const classes = {
+                success: 'rounded-lg bg-emerald-50 px-3 py-2 text-[11px] text-emerald-700 border border-emerald-200',
+                error: 'rounded-lg bg-red-50 px-3 py-2 text-[11px] text-red-700 border border-red-200',
+                info: 'rounded-lg bg-blue-50 px-3 py-2 text-[11px] text-blue-700 border border-blue-200'
+            };
+            status.textContent = message;
+            status.className = classes[type] || classes.info;
+        }
+
+        function collectNewStudentSkills() {
+            return Object.entries(newStudentSkillLevels).map(([name, level]) => ({ name, level }));
+        }
+
+        async function addNewStudentProfile() {
+            if (!mockProfilesData || !Array.isArray(mockProfilesData.profiles)) {
+                setAddStudentStatus('Database hồ sơ chưa sẵn sàng. Vui lòng thử lại sau vài giây.', 'error');
+                return;
+            }
+
+            const displayName = document.getElementById('new-student-name').value.trim();
+            const emailInput = document.getElementById('new-student-email').value.trim();
+            const currentIndustry = document.getElementById('new-student-industry').value || 'Sinh viên';
+            const desiredRoles = Array.from(newStudentDesiredRoles);
+            const interests = Array.from(newStudentInterests);
+            const notes = document.getElementById('new-student-notes').value.trim();
+            const skills = collectNewStudentSkills();
+
+            if (!displayName) {
+                setAddStudentStatus('Vui lòng nhập tên học viên.', 'error');
+                return;
+            }
+            if (skills.length === 0) {
+                setAddStudentStatus('Vui lòng chọn ít nhất một kỹ năng.', 'error');
+                return;
+            }
+            if (desiredRoles.length === 0) {
+                setAddStudentStatus('Vui lòng chọn ít nhất một vai trò mong muốn.', 'error');
+                return;
+            }
+            if (interests.length === 0) {
+                setAddStudentStatus('Vui lòng chọn ít nhất một lĩnh vực quan tâm.', 'error');
+                return;
+            }
+
+            const profilePayload = {
+                displayName,
+                email: emailInput,
+                skills,
+                desiredRoles,
+                interests,
+                currentIndustry,
+                yearsOfExperience: 0,
+                availability: 'part_time',
+                location: 'Remote',
+                notes: notes || 'Hồ sơ được tạo từ form Chia Role Nhóm.'
+            };
+
+            let createdProfile = null;
+            let savedToFile = false;
+
+            try {
+                const response = await fetch('/api/profiles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profilePayload)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result && result.data && result.profile) {
+                        createdProfile = result.profile;
+                        parseProfiles(result.data);
+                        savedToFile = true;
+                    }
+                }
+            } catch (err) {
+                console.warn('Profile API is not available. Falling back to localStorage.', err);
+            }
+
+            if (!createdProfile) {
+                const newId = getNextStudentId();
+                if (mockProfilesData.profiles.some(profile => profile.id === newId)) {
+                    setAddStudentStatus(`Mã ${newId} đã tồn tại. Vui lòng tải lại trang và thử lại.`, 'error');
+                    return;
+                }
+
+                createdProfile = { id: newId, ...profilePayload };
+                if (!createdProfile.email || createdProfile.email.startsWith('mpundefined')) {
+                    createdProfile.email = `${newId.toLowerCase()}@example.com`;
+                }
+                mockProfilesData.profiles.push(createdProfile);
+                saveProfilesData();
+                parseProfiles(mockProfilesData);
+            }
+
+            document.getElementById('new-student-name').value = '';
+            document.getElementById('new-student-email').value = '';
+            document.getElementById('new-student-industry').value = '';
+            document.getElementById('new-student-notes').value = '';
+            document.getElementById('student-search-input').value = displayName;
+            Object.keys(newStudentSkillLevels).forEach(key => delete newStudentSkillLevels[key]);
+            newStudentDesiredRoles.clear();
+            newStudentInterests.clear();
+            refreshNewStudentFormOptions();
+
+            showSuggestions();
+            const saveTarget = savedToFile ? 'file mock_profiles.json' : 'mock_profiles.json cục bộ';
+            setAddStudentStatus(`Đã tạo ${displayName} với mã ${createdProfile.id} và lưu vào ${saveTarget}.`, 'success');
+
+            const statusBadge = document.getElementById('db-status-badge');
+            if (statusBadge) {
+                statusBadge.innerText = `Online (${mockProfilesData.profiles.length} profiles)`;
+            }
+        }
+
+        function exportMockProfilesJson() {
+            if (!mockProfilesData || !Array.isArray(mockProfilesData.profiles)) {
+                setAddStudentStatus('Chưa có dữ liệu mock_profiles.json để xuất.', 'error');
+                return;
+            }
+
+            const exportData = JSON.stringify(mockProfilesData, null, 2);
+            const blob = new Blob([exportData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'mock_profiles.json';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            setAddStudentStatus('Đã xuất mock_profiles.json từ dữ liệu cục bộ.', 'success');
         }
 
         // Initialize App Dashboard
