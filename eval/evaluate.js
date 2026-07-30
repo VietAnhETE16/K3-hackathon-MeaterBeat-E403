@@ -93,7 +93,7 @@ function formatSecurityPrompt(rawPrompt) {
 // Load Security Prompt (Before modification: from Git HEAD)
 function getSecurityPromptBefore() {
     try {
-        const raw = execSync('git show HEAD:systemPrompt/anti-injection.md', { encoding: 'utf8' });
+        const raw = execSync('git show HEAD:codebase/systemPrompt/anti-injection.md', { encoding: 'utf8' });
         return formatSecurityPrompt(raw);
     } catch (e) {
         console.warn("Không thể đọc anti-injection.md từ git HEAD, sử dụng bản trống làm 'Before'.", e.message);
@@ -104,7 +104,7 @@ function getSecurityPromptBefore() {
 // Load Security Prompt (After modification: from current filesystem)
 function getSecurityPromptAfter() {
     try {
-        const raw = fs.readFileSync(path.join(WORKSPACE_DIR, 'systemPrompt', 'anti-injection.md'), 'utf8');
+        const raw = fs.readFileSync(path.join(WORKSPACE_DIR, 'codebase', 'systemPrompt', 'anti-injection.md'), 'utf8');
         return formatSecurityPrompt(raw);
     } catch (e) {
         console.error("Không thể đọc anti-injection.md từ tệp hiện tại.", e.message);
