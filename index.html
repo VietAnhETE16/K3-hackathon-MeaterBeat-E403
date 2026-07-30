@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLearn Codelabs - AI Agent Prototype</title>
+    <!-- Tailwind CSS & FontAwesome CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0b0f19] text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-14 bg-[#111827] border-b border-slate-800 flex items-center justify-between px-4 shrink-0">
+        <div class="flex items-center space-x-3">
+            <span class="bg-orange-600 text-xs font-bold px-2.5 py-1 rounded text-white">VLearn</span>
+            <h1 class="text-sm font-semibold text-slate-100">Lab 01 – Nền tảng LLM API & Phân Công Nhóm</h1>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+            <span
+                class="bg-blue-950 text-blue-400 border border-blue-800 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                <i class="fa-solid fa-database animate-pulse text-[10px]"></i> Mock Student Database
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Left: Codelab Content (Nội dung bài học & Khái niệm) -->
+        <main class="flex-1 overflow-y-auto p-6 max-w-4xl mx-auto space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <span class="text-xs text-orange-400 font-semibold tracking-wide uppercase">Codelab Interactive</span>
+                <h2 class="text-2xl font-bold text-white mt-1">Hoàn thành Task: Tích hợp GPT-4o & Đo Latency</h2>
+            </div>
+
+            <!-- Các bước bài học -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+                <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-ol text-orange-400"></i> Các bước thực hiện:
+                </h3>
+                <div class="space-y-3 text-xs text-slate-300">
+                    <div
+                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 1: Khởi tạo OpenAI Client</strong>
+                            <span>Import thư viện <code class="text-orange-300">openai</code> và thiết lập API Key trong
+                                biến môi trường.</span>
+                        </div>
+                        <button onclick="askAgentExplain('Bước 1: Khởi tạo OpenAI Client')"
+                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
+                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                        </button>
+                    </div>
+
+                    <div
+                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 2: Gửi Message & Điều chỉnh
+                                Temperature</strong>
+                            <span>Tạo đối tượng chat completion với các tham số <code
+                                    class="text-orange-300">temperature</code> và <code
+                                    class="text-orange-300">top_p</code>.</span>
+                        </div>
+                        <button onclick="askAgentExplain('Bước 2: Gửi Message & Điều chỉnh Temperature')"
+                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
+                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                        </button>
+                    </div>
+
+                    <div
+                        class="p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg flex justify-between items-center">
+                        <div>
+                            <strong class="text-slate-100 block text-sm mb-0.5">Bước 3: Bấm giờ & Tính Latency</strong>
+                            <span>Dùng <code class="text-orange-300">time.perf_counter()</code> đo thời gian trước và
+                                sau khi gửi request.</span>
+                        </div>
+                        <button onclick="askAgentExplain('Bước 3: Bấm giờ & Tính Latency')"
+                            class="px-2.5 py-1.5 bg-slate-700 hover:bg-orange-600 hover:text-white text-slate-200 rounded text-[11px] transition shrink-0">
+                            <i class="fa-solid fa-circle-question mr-1"></i> Giải thích
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng Khái Niệm -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-3">
+                <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-orange-400"></i> Khái niệm trọng tâm (Bấm để Agent giải
+                    thích):
+                </h3>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <button onclick="askAgentExplain('Khái niệm: Latency trong LLM')"
+                        class="p-3 bg-slate-800/30 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-left transition group">
+                        <div
+                            class="font-bold text-orange-400 group-hover:text-orange-300 flex items-center justify-between">
+                            <span>Latency (Độ trễ)</span>
+                            <i
+                                class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+                        <div class="text-slate-400 mt-1 text-[11px]">Thời gian từ khi gửi prompt đến khi nhận câu trả
+                            lời.</div>
+                    </button>
+
+                    <button onclick="askAgentExplain('Khái niệm: Temperature')"
+                        class="p-3 bg-slate-800/30 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-left transition group">
+                        <div
+                            class="font-bold text-orange-400 group-hover:text-orange-300 flex items-center justify-between">
+                            <span>Temperature</span>
+                            <i
+                                class="fa-solid fa-arrow-right text-[10px] opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+                        <div class="text-slate-400 mt-1 text-[11px]">Tham số điều chỉnh mức độ ngẫu nhiên/sáng tạo của
+                            model.</div>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right: AI Agent Overlay Panel -->
+        <aside class="w-[440px] bg-[#111827] border-l border-slate-800 flex flex-col h-full shadow-2xl shrink-0">
+
+            <!-- Agent Navigation Tabs -->
+            <div class="flex border-b border-slate-800 bg-slate-900/80 text-xs font-semibold">
+                <button id="tab-btn-explain" onclick="switchTab('explain')"
+                    class="flex-1 py-3 border-b-2 border-orange-500 text-orange-400 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-brain"></i> 1. Giải Thích / Tóm Tắt
+                </button>
+                <button id="tab-btn-role" onclick="switchTab('role')"
+                    class="flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-users-gear"></i> 2. Chia Role Nhóm
+                </button>
+            </div>
+
+            <!-- TAB 1: CHỨC NĂNG 1 - TÓM TẮT & GIẢI THÍCH CHI TIẾT -->
+            <div id="tab-explain" class="flex-1 flex flex-col overflow-hidden p-4 space-y-3">
+                <div
+                    class="bg-slate-900 border border-slate-800 p-2.5 rounded-lg text-xs text-slate-300 flex justify-between items-center">
+                    <span>Chế độ phản hồi:</span>
+                    <div class="flex bg-slate-800 p-1 rounded gap-1 text-[11px]">
+                        <button id="mode-summary" onclick="setExplainMode('summary')"
+                            class="px-2 py-0.5 rounded bg-orange-600 text-white font-medium">Tóm tắt</button>
+                        <button id="mode-detail" onclick="setExplainMode('detail')"
+                            class="px-2 py-0.5 rounded text-slate-400 hover:text-white">Chi tiết</button>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Scroll Area -->
+                <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+                    <div class="bg-slate-900/80 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1.5">
+                        <div class="font-bold text-orange-400 flex items-center gap-1">
+                            <i class="fa-solid fa-robot"></i> AI Tutor
+                        </div>
+                        <p>Xin chào! Bạn có thể chọn một Bước hoặc Khái niệm bên bài học để tôi **Tóm tắt** hoặc **Giải
+                            thích chi tiết** nhé.</p>
+                    </div>
+                </div>
+
+                <!-- Input Box -->
+                <div class="pt-2 border-t border-slate-800 flex gap-2">
+                    <input type="text" id="user-input" placeholder="Nhập câu hỏi hoặc khái niệm..."
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500">
+                    <button onclick="handleUserSend()"
+                        class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-lg text-xs transition">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: CHỨC NĂNG 2 - CHỌN HỌC VIÊN TỪ DROPLIST & CHIA ROLE -->
+            <div id="tab-role" class="flex-1 flex flex-col overflow-y-auto p-4 space-y-4 text-xs hidden">
+
+                <!-- Droplist & Search Student Section -->
+                <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl space-y-3">
+                    <div class="font-bold text-slate-100 flex items-center justify-between">
+                        <span><i class="fa-solid fa-id-card text-orange-400 mr-1.5"></i> Chọn / Điền Học Viên Vào
+                            Nhóm</span>
+                        <span class="text-[10px] bg-blue-900/50 text-blue-300 px-1.5 py-0.5 rounded">Mock
+                            Database</span>
+                    </div>
+
+                    <!-- Autocomplete Search Input -->
+                    <div class="space-y-1 relative" id="search-container">
+                        <label class="text-[11px] text-slate-400">Tìm kiếm học viên (theo Tên hoặc Mã HV):</label>
+                        <div class="relative">
+                            <input type="text" id="student-search-input" oninput="handleSearchInput()"
+                                onfocus="showSuggestions()" placeholder="Nhập tên hoặc mã học viên..."
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg pl-3 pr-10 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500">
+                            <div class="absolute right-3 top-2.5 text-slate-500 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                        </div>
+                        <!-- Suggestions Droplist -->
+                        <div id="student-suggestions" class="absolute z-20 w-full left-0 mt-1 bg-slate-950 border border-slate-800 rounded-lg shadow-xl max-h-52 overflow-y-auto hidden">
+                            <!-- Suggestions will be injected here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Selected Team List & Auto-fetched Skill Profiles -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-300 text-[11px] uppercase tracking-wider">
+                                <i class="fa-solid fa-users text-orange-400 mr-1"></i> Thành viên đã chọn (<span
+                                    id="team-count">0</span>):
+                            </h4>
+                            <button onclick="clearTeam()"
+                                class="text-[10px] text-slate-500 hover:text-red-400 transition">Xóa tất cả</button>
+                        </div>
+
+                        <div id="team-list-container" class="space-y-2">
+                            <div id="empty-team-msg"
+                                class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-[11px]">
+                                Chưa có học viên nào được chọn. Hãy chọn từ Droplist ở trên.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Assignment Button -->
+                    <button id="btn-assign-role" onclick="generateRoleAssignment()" disabled
+                        class="w-full bg-slate-800 text-slate-500 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Tự Động Phân Chia Role Theo Hồ Sơ</span>
+                    </button>
+
+                    <!-- Role Assignment Result -->
+                    <div id="role-result" class="hidden space-y-3 pt-2 border-t border-slate-800">
+                        <div class="font-bold text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-square-check"></i> Kết quả phân công dựa trên Hồ sơ:
+                        </div>
+                        <div id="role-cards-container" class="space-y-2">
+                            <!-- Dynamic Role Output -->
+                        </div>
+                    </div>
+
+                </div>
+        </aside>
+    </div>
+
+    <!-- Javascript Logic -->
+    <script>
+        // Mock Database of Students (Will be fetched via API in production)
+        const mockDatabase = {
+            "20233827": {
+                id: "20233827",
+                name: "Mai Việt Anh",
+                skills: [
+                    { name: "Machine Learning", level: 3, cat: "ai" },
+                    { name: "NLP", level: 3, cat: "ai" },
+                    { name: "Backend", level: 2, cat: "eng" },
+                    { name: "Communication", level: 3, cat: "lead" }
+                ]
+            },
+            "20233828": {
+                id: "20233828",
+                name: "Nguyễn Quang Dũng",
+                skills: [
+                    { name: "Frontend", level: 4, cat: "eng" },
+                    { name: "UI/UX Design", level: 4, cat: "design" },
+                    { name: "Communication", level: 4, cat: "lead" }
+                ]
+            },
+            "20233829": {
+                id: "20233829",
+                name: "Trần Phú Nghĩa",
+                skills: [
+                    { name: "Backend", level: 4, cat: "eng" },
+                    { name: "DevOps/Cloud", level: 3, cat: "eng" },
+                    { name: "Data Engineering", level: 3, cat: "ai" }
+                ]
+            },
+            "20233830": {
+                id: "20233830",
+                name: "Lê Hoàng Nam",
+                skills: [
+                    { name: "Mobile", level: 4, cat: "eng" },
+                    { name: "Project Management", level: 3, cat: "lead" },
+                    { name: "Backend", level: 3, cat: "eng" }
+                ]
+            },
+            "20233831": {
+                id: "20233831",
+                name: "Phạm Minh Đức",
+                skills: [
+                    { name: "Docker/K8s", level: 4, cat: "eng" },
+                    { name: "Linux SysAdmin", level: 3, cat: "eng" },
+                    { name: "QA Automation", level: 3, cat: "eng" }
+                ]
+            },
+            "20233832": {
+                id: "20233832",
+                name: "Đỗ Thị Thuỳ Linh",
+                skills: [
+                    { name: "UI/UX Design", level: 4, cat: "design" },
+                    { name: "Product Design", level: 4, cat: "design" },
+                    { name: "Figma Pro", level: 5, cat: "design" }
+                ]
+            },
+            "20233833": {
+                id: "20233833",
+                name: "Hoàng Văn Khánh",
+                skills: [
+                    { name: "Python Core", level: 4, cat: "eng" },
+                    { name: "FastAPI / Django", level: 3, cat: "eng" },
+                    { name: "SQL & Databases", level: 4, cat: "eng" }
+                ]
+            },
+            "20233834": {
+                id: "20233834",
+                name: "Vũ Thị Hồng Hạnh",
+                skills: [
+                    { name: "Manual Testing", level: 4, cat: "qa" },
+                    { name: "JUnit / PyTest", level: 3, cat: "qa" },
+                    { name: "Documentation", level: 4, cat: "lead" }
+                ]
+            }
+        };
+
+        // State variables
+        let selectedTeam = [];
+        let currentMode = 'summary';
+
+        function switchTab(tab) {
+            const tabExplain = document.getElementById('tab-explain');
+            const tabRole = document.getElementById('tab-role');
+            const btnExplain = document.getElementById('tab-btn-explain');
+            const btnRole = document.getElementById('tab-btn-role');
+
+            if (tab === 'explain') {
+                tabExplain.classList.remove('hidden');
+                tabRole.classList.add('hidden');
+                btnExplain.className = "flex-1 py-3 border-b-2 border-orange-500 text-orange-400 flex items-center justify-center gap-2";
+                btnRole.className = "flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-2";
+            } else {
+                tabRole.classList.remove('hidden');
+                tabExplain.classList.add('hidden');
+                btnRole.className = "flex-1 py-3 border-b-2 border-orange-500 text-orange-400 flex items-center justify-center gap-2";
+                btnExplain.className = "flex-1 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center justify-center gap-2";
+            }
+        }
+
+        function setExplainMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-summary').className = mode === 'summary' ? 'px-2 py-0.5 rounded bg-orange-600 text-white font-medium' : 'px-2 py-0.5 rounded text-slate-400 hover:text-white';
+            document.getElementById('mode-detail').className = mode === 'detail' ? 'px-2 py-0.5 rounded bg-orange-600 text-white font-medium' : 'px-2 py-0.5 rounded text-slate-400 hover:text-white';
+        }
+
+        function askAgentExplain(topic) {
+            switchTab('explain');
+            const chatBox = document.getElementById('chat-box');
+
+            const userMsg = document.createElement('div');
+            userMsg.className = "bg-orange-600/20 border border-orange-500/30 p-2.5 rounded-xl text-slate-200 ml-6 text-right";
+            userMsg.innerHTML = `<span class="text-[10px] text-orange-400 block mb-0.5">Bạn hỏi (${currentMode === 'summary' ? 'Tóm tắt' : 'Chi tiết'}):</span> ${topic}`;
+            chatBox.appendChild(userMsg);
+
+            setTimeout(() => {
+                const aiMsg = document.createElement('div');
+                aiMsg.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1.5";
+
+                let responseText = "";
+                if (currentMode === 'summary') {
+                    responseText = `<strong>[Tóm tắt ngắn]:</strong> ${topic} giúp thiết lập kết nối và điều phối dữ liệu với mô hình AI trong thời gian ngắn nhất, tối ưu hiệu năng gọi API.`;
+                } else {
+                    responseText = `<strong>[Giải thích chi tiết]:</strong>
+                        <ul class="list-disc list-inside space-y-1 mt-1 text-slate-300">
+                            <li><strong>Bản chất:</strong> Thao tác với ${topic} điều chỉnh cách gói tin HTTP Request được đóng gói và gửi tới Server OpenAI.</li>
+                            <li><strong>Ứng dụng:</strong> Giúp tính toán chính xác chi phí API trên mỗi lượt gọi và kiểm soát rủi ro Timeout.</li>
+                        </ul>`;
+                }
+
+                aiMsg.innerHTML = `<div class="font-bold text-orange-400 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div>${responseText}</div>`;
+                chatBox.appendChild(aiMsg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 500);
+        }
+
+        function handleUserSend() {
+            const input = document.getElementById('user-input');
+            if (input.value.trim() !== '') {
+                askAgentExplain(input.value);
+                input.value = '';
+            }
+        }
+
+        // Helper to remove diacritics for search matching
+        function removeDiacritics(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        // Search & Autocomplete suggestions logic
+        function showSuggestions() {
+            handleSearchInput();
+        }
+
+        function handleSearchInput() {
+            const input = document.getElementById('student-search-input');
+            const query = removeDiacritics(input.value.trim());
+            const suggestionsContainer = document.getElementById('student-suggestions');
+
+            suggestionsContainer.innerHTML = '';
+
+            let matchedCount = 0;
+            const fragment = document.createDocumentFragment();
+
+            for (const key in mockDatabase) {
+                const student = mockDatabase[key];
+                const matchId = student.id.includes(query);
+                const matchName = removeDiacritics(student.name).includes(query);
+
+                if (query === '' || matchId || matchName) {
+                    matchedCount++;
+                    const item = document.createElement('div');
+                    item.className = "px-3 py-2 hover:bg-slate-800 cursor-pointer flex justify-between items-center border-b border-slate-900/60 last:border-0";
+
+                    const isAlreadySelected = selectedTeam.some(s => s.id === student.id);
+                    let mainSkills = student.skills.slice(0, 2).map(s => s.name).join(', ');
+
+                    item.innerHTML = `
+                        <div class="flex flex-col text-left">
+                            <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                                ${student.name}
+                                <span class="text-[10px] text-slate-500 font-mono font-normal">(${student.id})</span>
+                            </span>
+                            <span class="text-[10px] text-slate-400 mt-0.5">${mainSkills}</span>
+                        </div>
+                        ${isAlreadySelected ?
+                            `<span class="text-[10px] text-slate-500 bg-slate-900/80 px-1.5 py-0.5 rounded border border-slate-800 shrink-0">Đã chọn</span>` :
+                            `<span class="text-[10px] text-orange-400 hover:text-orange-300 font-medium shrink-0">Chọn</span>`
+                        }
+                    `;
+                    item.addEventListener('click', () => {
+                        if (isAlreadySelected) {
+                            alert('Học viên này đã có trong danh sách nhóm!');
+                        } else {
+                            selectStudent(student.id);
+                        }
+                    });
+
+                    fragment.appendChild(item);
+                }
+            }
+
+            if (matchedCount > 0) {
+                suggestionsContainer.appendChild(fragment);
+                suggestionsContainer.classList.remove('hidden');
+            } else {
+                const noResult = document.createElement('div');
+                noResult.className = "px-3 py-2.5 text-slate-500 text-center text-[11px]";
+                noResult.innerText = "Không tìm thấy học viên nào";
+                suggestionsContainer.appendChild(noResult);
+                suggestionsContainer.classList.remove('hidden');
+            }
+        }
+
+        function selectStudent(studentId) {
+            const studentData = mockDatabase[studentId];
+            if (studentData) {
+                selectedTeam.push(JSON.parse(JSON.stringify(studentData)));
+                renderTeamList();
+            }
+
+            const input = document.getElementById('student-search-input');
+            input.value = '';
+            hideSuggestions();
+        }
+
+        function hideSuggestions() {
+            document.getElementById('student-suggestions').classList.add('hidden');
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function (e) {
+            const container = document.getElementById('search-container');
+            if (container && !container.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
+
+        function removeStudent(studentId) {
+            selectedTeam = selectedTeam.filter(s => s.id !== studentId);
+            renderTeamList();
+        }
+
+        function clearTeam() {
+            selectedTeam = [];
+            renderTeamList();
+        }
+
+        function renderTeamList() {
+            const container = document.getElementById('team-list-container');
+            const countLabel = document.getElementById('team-count');
+            const btnAssign = document.getElementById('btn-assign-role');
+            const resultBox = document.getElementById('role-result');
+
+            resultBox.classList.add('hidden');
+            countLabel.innerText = selectedTeam.length;
+
+            if (selectedTeam.length === 0) {
+                container.innerHTML = `<div id="empty-team-msg" class="p-4 text-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-[11px]">
+                    Chưa có học viên nào được chọn. Hãy tìm kiếm học viên ở trên.
+                </div>`;
+                btnAssign.disabled = true;
+                btnAssign.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2";
+                return;
+            }
+
+            btnAssign.disabled = false;
+            btnAssign.className = "w-full bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2 shadow-lg shadow-orange-600/20 cursor-pointer";
+
+            let html = '';
+            selectedTeam.forEach((student) => {
+                let skillBadges = student.skills.map(sk =>
+                    `<span class="bg-slate-800 text-orange-300 border border-slate-700 px-1.5 py-0.5 rounded text-[10px]">${sk.name}: ${sk.level}/5</span>`
+                ).join(' ');
+
+                html += `
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl space-y-2 relative group">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-100 flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-graduate text-orange-400"></i> ${student.name}
+                            <span class="text-[10px] text-slate-400 font-mono font-normal">(${student.id})</span>
+                        </span>
+                        <button onclick="removeStudent('${student.id}')" class="text-slate-500 hover:text-red-400 text-xs px-1.5 py-0.5 rounded transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${skillBadges}
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function generateRoleAssignment() {
+            if (selectedTeam.length === 0) return;
+
+            const resultBox = document.getElementById('role-result');
+            const container = document.getElementById('role-cards-container');
+
+            let html = '';
+            const roleTemplates = [
+                { title: "Lead AI & Prompt Engineering", desc: "Tạo System Prompt, cấu hình Temperature/Top_P và tối ưu hoá ngữ cảnh câu hỏi." },
+                { title: "Frontend & UI/UX Developer", desc: "Xây dựng Chatbot Overlay Widget và xử lý trạng thái hiển thị trên VLearn Codelab." },
+                { title: "Backend & Latency Engineer", desc: "Xây dựng API Client kết nối OpenAI API, sử dụng time.perf_counter() đo độ trễ." },
+                { title: "DevOps & QA Tester", desc: "Viết Testsuite kiểm thử hàm và quản lý tệp cấu hình biến môi trường (.env)." }
+            ];
+
+            selectedTeam.forEach((student, index) => {
+                let role = roleTemplates[index % roleTemplates.length];
+                let topSkill = student.skills.length > 0 ? student.skills[0].name : "General";
+
+                html += `
+                <div class="p-3 bg-slate-900/90 border border-orange-500/40 rounded-xl space-y-1.5">
+                    <div class="font-bold text-orange-300 flex justify-between items-center">
+                        <span>${student.name} ➔ ${role.title}</span>
+                        <span class="text-[10px] bg-orange-950 text-orange-300 border border-orange-800 px-1.5 py-0.5 rounded">${topSkill}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300"><strong>Nhiệm vụ:</strong> ${role.desc}</p>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            resultBox.classList.remove('hidden');
+        }
+    </script>
+</body>
+
+</html>
