@@ -1,0 +1,76 @@
+{
+  "id": "day05-06-ai-thuc-chien-venture-arena",
+  "title": "Lab 05–06 — AI Thực Chiến: Venture Arena",
+  "duration": 900,
+  "author": "AI Thực Chiến",
+  "updated": "2026-07-30",
+  "category": "AI Product Hackathon",
+  "description": "Hướng dẫn từng bước để team xây, kiểm chứng, pitch và đầu tư trong Venture Arena.",
+  "day": "05–06",
+  "preparationTipIds": "$undefined",
+  "keywords": "$undefined",
+  "version": "1",
+  "updatedSignificant": "$undefined",
+  "learningPath": "$undefined",
+  "sequence": "$undefined",
+  "level": "intermediate",
+  "prerequisites": [
+    "Đã hoàn thành các Lab AI Thực Chiến trước đó",
+    "Có thể truy cập repository đề bài đúng khóa"
+  ],
+  "requiredLessonIds": "$undefined",
+  "outcomes": [
+    "Chứng minh một pain point bằng dữ liệu",
+    "Hoàn thiện prototype AI có thể demo",
+    "Pitch và đầu tư có căn cứ"
+  ],
+  "supportedOs": [
+    "Windows",
+    "macOS"
+  ],
+  "requiredTools": [
+    "GitHub",
+    "Trình duyệt",
+    "Công cụ AI phù hợp với giải pháp"
+  ],
+  "commonErrors": [
+    "Chọn sai repository của khóa",
+    "Dùng dữ liệu định danh hoặc commit data pack",
+    "Nộp checkpoint muộn"
+  ],
+  "requiresSubmission": "$undefined",
+  "presentationUrl": "$undefined",
+  "bookletUrl": "$undefined",
+  "published": true,
+  "format": "steps",
+  "steps": [
+    {
+      "title": "1. Chọn chiến tuyến và hiểu cách thắng",
+      "content": "Bạn không cần làm sản phẩm lớn nhất. Bạn cần tìm một vấn đề đủ thật, chứng minh nó bằng dữ liệu và đưa ra một lát cắt AI đáng để thử.\n\nChọn một trong ba chiến tuyến:\n\n1. **Cải tiến VLearn AI Tutor:** tối ưu tutor hiện có hoặc đề xuất một năng lực AI mới.\n2. **Trợ lý học viên trên Discord:** giúp cộng đồng tìm đúng tri thức, đúng người hoặc đúng hỗ trợ vào đúng lúc.\n3. **Hướng mở:** tự tìm một pain point đáng giải từ dữ liệu được phép khai thác.\n\n:::goal{title=\"Mục tiêu của team\"}\nChốt một pain point cụ thể: ai gặp vấn đề, ở khoảnh khắc nào và hậu quả là gì.\n:::\n\n**Kết quả mong đợi:** cả team có thể nói rõ trong một câu: “Chúng tôi giúp _ai_ làm _việc gì_ tốt hơn khi _điểm đau nào_ xảy ra.”"
+    },
+    {
+      "title": "2. Lập team và mở đúng đề bài",
+      "content": "Mỗi team thường có **3–5 thành viên**. Hãy phân công tối thiểu một người chịu trách nhiệm theo dõi repository và checkpoint; tất cả thành viên vẫn phải hiểu được phần team nộp.\n\n1. Hoàn thiện [Form lập đội](https://forms.gle/YQyndjYtPKfw1aaGA).\n2. Chọn đúng repository đề bài của khóa bạn đang học:\n   - [Khóa 3 — Batch03-K3-AI-Product-Hackathon](https://github.com/VinUni-AI20k/Batch03-K3-AI-Product-Hackathon)\n   - [Khóa 4 — Batch03-K4-AI-Product-Hackathon](https://github.com/VinUni-AI20k/Batch03-K4-AI-Product-Hackathon)\n3. Đọc `README.md`, `01-de-bai.md`, `04-rubric.md` và cấu trúc artifact trước khi bắt đầu build.\n\n:::caution{title=\"Chọn đúng khóa\"}\nKhông dùng repository của khóa khác. Rubric, lịch checkpoint và cách nộp được áp dụng theo repository của đúng khóa bạn đang học.\n:::\n\n**Kết quả mong đợi:** team có một repository chung và biết rõ artifact nào cần xuất hiện trong đó."
+    },
+    {
+      "title": "3. Khai thác dữ liệu và chốt Problem Canvas",
+      "content": "Bắt đầu từ bằng chứng, không bắt đầu từ tên tính năng.\n\n1. Đọc data dictionary trước khi mining chatlog AI Tutor hoặc transcript bài giảng.\n2. Viết tối thiểu một pain point với actor, hành vi, trở ngại và hậu quả rõ ràng.\n3. Dùng một trong hai con đường bằng chứng: khảo sát tối thiểu 20 người ngoài team với ít nhất 50% xác nhận, **hoặc** mining có số đếm, ít nhất 5 ví dụ và cách kiểm lại được.\n4. So sánh ít nhất ba cơ hội impact trước khi chọn một cơ hội để đi tiếp.\n\n:::caution{title=\"Dữ liệu là đặc quyền\"}\nChỉ dùng data pack của hackathon hoặc dữ liệu giả tự sinh. Không đưa data pack lên repository, không công khai raw chat và không cố suy ngược danh tính từ dữ liệu đã ẩn danh.\n:::\n\n:::checkpoint{title=\"Sẵn sàng cho CP1\"}\n- Pain point có actor, thời điểm và hậu quả.\n- Có evidence log hoặc kế hoạch khảo sát kiểm lại được.\n- Team đã chốt candidate đi tiếp.\n:::"
+    },
+    {
+      "title": "4. Thiết kế lát cắt và làm AI chạy thật",
+      "content": "Một sản phẩm đáng demo không cần bao phủ cả thế giới. Nó cần giải quyết trọn vẹn một khoảnh khắc giá trị.\n\n1. Viết lát cắt theo mẫu: **một người dùng · một công việc · một quyết định AI · một kết quả**.\n2. Xác định phần nào là Sketch, Mock hoặc Working; ghi rõ mọi phần mock.\n3. Prototype ở bất kỳ mức nào cũng cần có **ít nhất một lời gọi AI chạy thật**.\n4. Xác định ít nhất ba chỗ khó hoặc kịch bản rủi ro, cùng cách team xử lý/fallback.\n5. Chuẩn bị flow mà người xem có thể bấm hoặc quan sát được ở CP2 và CP3.\n\n**Kết quả mong đợi:** bạn demo được một hành trình hẹp trong khoảng 5 phút và giải thích được vì sao AI xuất hiện ở đúng điểm đó."
+    },
+    {
+      "title": "5. Kiểm thử, validation và hoàn thiện artifact",
+      "content": "Đừng đợi đến Demo mới tìm bằng chứng sản phẩm có giá trị.\n\n1. Tạo `eval/` với golden set và kết quả các lượt chạy; nêu quality bar của team.\n2. Lưu feedback thực tế trong `validation/`; có ít nhất 3 người thật ngoài team đồng ý thử prototype trước Demo.\n3. Hoàn thiện `spec.md`, `codebase/`, `eval/`, `validation/`, `demo-slides.pdf` và `reflection/` theo repository đề bài.\n4. Nộp `spec.md` trước hạn cứng **23:59 ngày 1**.\n\n### Điểm học thuật\n\nTổng điểm là **100 = 25 điểm nộp checkpoint + 75 điểm chấm artifact trong repository**.\n\n- CP1–CP5: mỗi checkpoint 5 điểm; nộp đúng hạn được 5 điểm, nộp muộn nhận 0 điểm tại mốc đó.\n- Mỗi thành viên nộp riêng, nhưng cả team dùng chung một link repository.\n- 75 điểm artifact: R1 Bằng chứng & impact 15; R2 Lát cắt & thiết kế 15; R3 Chỗ khó & kịch bản rủi ro 11; R4 Kiểm thử 15; R5 Prototype 8; R6 Validation 8; R7 Quy trình & repo 3."
+    },
+    {
+      "title": "6. Pitch như Startup, đầu tư như Investor",
+      "content": "Venture Arena mô phỏng một thị trường: giá trị tốt cần được nhìn thấy và hiểu đúng.\n\n1. Khi đến lượt Startup, pitch khoảng 5 phút theo điều phối của Labcoach: pain point, bằng chứng, lát cắt giải pháp, demo, validation và lời mời đầu tư.\n2. Khi đến lượt Investor, xem kỹ các team khác và dùng tối đa **100 điểm đầu tư giả lập**.\n3. Không đầu tư cho chính team mình; team có thể dồn điểm cho một Startup hoặc phân bổ theo chiến lược.\n4. Mỗi khoản đầu tư bắt buộc có một lý do ngắn, cụ thể dựa trên pain point, evidence, khả năng triển khai, tác động hoặc chất lượng pitch.\n\n:::decision{title=\"Đầu tư có căn cứ\"}\n| Câu hỏi trước khi đầu tư | Dấu hiệu tốt |\n| --- | --- |\n| Pain có thật không? | Có evidence kiểm lại được. |\n| AI có cần thiết không? | AI tạo một quyết định hoặc trải nghiệm rõ hơn cách làm thông thường. |\n| Team có thể đi tiếp không? | Demo, risk và validation cho thấy hướng triển khai khả thi. |\n:::\n\n**Kết quả mong đợi:** phiếu đầu tư hợp lệ, không vượt 100 điểm và có lý do cho từng khoản."
+    },
+    {
+      "title": "7. Demo, vinh danh và bàn giao",
+      "content": "Top 3 Startup là ba team nhận tổng điểm đầu tư cao nhất. Với mỗi Startup Top 3, team đầu tư nhiều điểm nhất vào startup đó được vinh danh là **Investor đồng hành**. Cả Top 3 Startup và ba Investor đồng hành đều có phần thưởng.\n\nNếu hòa điểm đầu tư, ban tổ chức dùng tổng điểm checkpoint/jury đã công bố để phân hạng. Điểm đầu tư không thay thế điểm học thuật.\n\nTrước CP6, kiểm tra lần cuối:\n\n- [ ] Repository không chứa API key hoặc data pack.\n- [ ] Demo chạy được và team có phương án fallback.\n- [ ] `spec.md`, eval, validation và reflection khớp với những gì team pitch.\n- [ ] Mỗi thành viên hiểu phần team đã làm.\n- [ ] Pitch giải thích được vì sao sản phẩm cần tồn tại, không chỉ sản phẩm trông như thế nào.\n\n> **Đừng pitch để được vỗ tay. Hãy pitch để được đặt cược.**"
+    }
+  ]
+}
