@@ -8,8 +8,10 @@
     <!-- Tailwind CSS, FontAwesome & marked.js CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="data/lab_data.js"></script>
+    <script src="data/codelabs/lab_data.js"></script>
+    <script src="data/tips/tips_data.js"></script>
     <script src="data/env.js"></script>
+    <script src="data/system_prompts.js"></script>
     <script src="data/mock_profiles.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -594,7 +596,7 @@
                     const text = await response.text();
                     const match = text.match(/OPENAI_API_KEY\s*=\s*([^\r\n]+)/);
                     if (match && match[1]) {
-                        window.OPENAI_API_KEY = match[1].trim().replace(/['"]/g, ''); // strip optional quotes
+                        window.OPENAI_API_KEY = match[1].trim().replace(/['"]/g, '');
                         console.log("Loaded API Key from .env successfully.");
                     }
                 }
@@ -1340,65 +1342,163 @@
                 return;
             }
 
-            // If not cached, fetch from real API
+            // Get original step data
             const step = currentLabData.steps[stepNum - 1];
             const titleText = step ? step.title : `Bước ${stepNum}`;
-            
-            mainContent.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-24 space-y-4">
-                    <i class="fa-solid fa-spinner animate-spin text-orange-600 text-3xl"></i>
-                    <p class="text-xs text-slate-500 font-medium">AI Tutor đang tạo bản hướng dẫn cá nhân hóa (${type === 'non-it' ? 'Non-IT' : 'Technical IT'}) cho Bước ${stepNum}...</p>
+            const originalContent = step ? step.content : '';
+
+            // Parse original content to HTML
+            const originalHtml = marked.parse(originalContent);
+
+            // Gather related tips from TIPS_DATA using preparationTipIds
+            let relatedTipsHtml = '';
+            let relatedTipsContext = '';
+            const tipIds = currentLabData.preparationTipIds;
+            if (tipIds && Array.isArray(tipIds) && typeof TIPS_DATA !== 'undefined') {
+                tipIds.forEach(tipId => {
+                    const tipData = TIPS_DATA[tipId];
+                    if (tipData && tipData.steps && tipData.steps.length > 0) {
+                        // Collect all step contents from this tip
+                        const tipStepsContent = tipData.steps.map(s => s.content).join('\n\n');
+                        relatedTipsContext += `\n\n--- TIP: ${tipData.title} ---\n${tipStepsContent}`;
+
+                        // Build HTML cards for each tip
+                        const tipContentHtml = tipData.steps.map(s => 
+                            `<div class="border-b border-amber-100 last:border-0 pb-3 last:pb-0">
+                                <h5 class="text-[11px] font-bold text-amber-800 mb-1">${s.title}</h5>
+                                <div class="text-[11px] leading-relaxed text-slate-600 markdown-content">${marked.parse(s.content)}</div>
+                            </div>`
+                        ).join('');
+
+                        relatedTipsHtml += `
+                        <details class="bg-amber-50/50 border border-amber-200 rounded-lg overflow-hidden">
+                            <summary class="px-4 py-2.5 cursor-pointer hover:bg-amber-50 transition flex items-center gap-2 text-xs font-semibold text-amber-800">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                                ${tipData.title}
+                                <span class="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full ml-auto">${tipData.duration || '?'} phút · ${tipData.steps.length} bước</span>
+                            </summary>
+                            <div class="px-4 pb-3 space-y-3 max-h-96 overflow-y-auto">
+                                ${tipContentHtml}
+                            </div>
+                        </details>`;
+                    }
+                });
+            }
+
+            // Build the page layout
+            const modeLabel = type === 'non-it' ? '🔰 Chế độ Non-IT' : '💻 Chế độ Technical IT';
+            const modeDesc = type === 'non-it'
+                ? 'Tài liệu gốc được giữ nguyên. AI phân tích tài liệu gốc + Tips liên quan để tạo hướng dẫn cá nhân hóa.'
+                : 'Tài liệu gốc được giữ nguyên. AI phân tích kỹ thuật chuyên sâu dựa trên tài liệu gốc + Tips liên quan.';
+
+            const tipsSection = relatedTipsHtml ? `
+                <!-- RELATED TIPS (from tips_data.js) -->
+                <div class="bg-white border border-amber-200 rounded-xl p-5 space-y-3 shadow-sm">
+                    <h3 class="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-amber-600"></i> Tips Chuẩn Bị Liên Quan
+                        <span class="text-[9px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Bấm để mở rộng</span>
+                    </h3>
+                    <div class="space-y-2">
+                        ${relatedTipsHtml}
+                    </div>
+                </div>
+            ` : '';
+
+            const pageHtml = `
+                <div class="space-y-6">
+                    <!-- Header with mode indicator & back button -->
+                    <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Codelab Interactive - Bước ${stepNum}</span>
+                            <h2 class="text-2xl font-bold text-slate-900 mt-1">${titleText}</h2>
+                            <div class="mt-2 flex items-center gap-2">
+                                <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${type === 'non-it' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}">${modeLabel}</span>
+                                <span class="text-[10px] text-slate-400">${modeDesc}</span>
+                            </div>
+                        </div>
+                        <button onclick="restoreOriginalGuide()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-medium shadow-sm border-0 shrink-0">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> Quay lại bản gốc
+                        </button>
+                    </div>
+
+                    <!-- ORIGINAL DOCUMENT (kept intact) -->
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+                        <h3 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-file-lines text-blue-600"></i> Tài liệu gốc
+                        </h3>
+                        <div class="text-xs leading-relaxed text-slate-700 markdown-content">
+                            ${originalHtml}
+                        </div>
+                    </div>
+
+                    ${tipsSection}
+
+                    <!-- AI PERSONALIZED GUIDANCE (generated from original + tips) -->
+                    <div class="bg-gradient-to-br ${type === 'non-it' ? 'from-green-50 to-emerald-50 border-green-200' : 'from-purple-50 to-indigo-50 border-purple-200'} border rounded-xl p-5 space-y-4 shadow-sm" id="ai-tips-section">
+                        <h3 class="text-sm font-semibold ${type === 'non-it' ? 'text-green-800' : 'text-purple-800'} flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles ${type === 'non-it' ? 'text-green-600' : 'text-purple-600'}"></i>
+                            ${type === 'non-it' ? 'Hướng Dẫn Cá Nhân Hóa (Non-IT)' : 'Hướng Dẫn Cá Nhân Hóa (Technical IT)'}
+                            <span class="text-[9px] ${type === 'non-it' ? 'bg-green-100 text-green-700' : 'bg-purple-100 text-purple-700'} px-2 py-0.5 rounded-full font-medium">Được AI tạo từ tài liệu gốc + Tips</span>
+                        </h3>
+                        <div id="ai-tips-content">
+                            <div class="flex items-center gap-2 py-8 justify-center">
+                                <i class="fa-solid fa-spinner animate-spin ${type === 'non-it' ? 'text-green-600' : 'text-purple-600'} text-lg"></i>
+                                <span class="text-xs text-slate-500 font-medium">AI Tutor đang phân tích tài liệu gốc và các Tips liên quan...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
 
+            mainContent.innerHTML = pageHtml;
+
             try {
-                let systemPrompt = "";
+                // Get the appropriate system prompt from SYSTEM_PROMPTS
+                let baseSystemPrompt = '';
                 if (type === 'non-it') {
-                    systemPrompt = "Bạn là AI Tutor thân thiện trên VLearn. Hãy giải thích bước học tập sau đây cho học viên thuộc nhóm Non-IT (ngành Kinh tế, Kinh doanh, Quản lý, Xã hội...). Tránh dùng thuật ngữ kỹ thuật phức tạp, hãy dùng tối thiểu một ẩn dụ thực tế trong đời sống (Ví dụ: gọi API giống như gọi món nhà hàng, git giống như lưu trữ hồ sơ...). Chia các hành động thành danh sách bước nhỏ đơn giản. Cung cấp hộp 'Tại sao cần làm?' (Why Box) tóm tắt ý nghĩa thực tiễn. Trả về định dạng Markdown tiêu chuẩn.";
+                    baseSystemPrompt = (typeof SYSTEM_PROMPTS !== 'undefined' && SYSTEM_PROMPTS.nontech) ? SYSTEM_PROMPTS.nontech : '';
                 } else {
-                    systemPrompt = "Bạn là AI Tutor cao cấp trên VLearn. Hãy viết hướng dẫn kỹ thuật chuyên sâu (Technical Deep-Dive) cho học viên ngành Công nghệ thông tin (IT/SE). Tập trung vào các Core Specifications, Constraints, tối ưu hiệu năng, bảo mật và cấu trúc mã nguồn. Cung cấp Terminal Commands rõ ràng và một Standard Reference Code Snippet thực tế dưới định dạng mã Markdown (Ví dụ python). Viết phần tối ưu hóa ở cuối. Trả về định dạng Markdown tiêu chuẩn.";
+                    baseSystemPrompt = (typeof SYSTEM_PROMPTS !== 'undefined' && SYSTEM_PROMPTS.fresher) ? SYSTEM_PROMPTS.fresher : '';
                 }
 
-                const userPrompt = `Hãy chuyển đổi nội dung bước học tập sau:\nTên bước: ${titleText}\nNội dung gốc:\n${step ? step.content : ''}`;
+                let systemPrompt = '';
+                if (type === 'non-it') {
+                    systemPrompt = baseSystemPrompt + `\n\n---\nBỐI CẢNH BỔ SUNG: Bạn đang đóng vai AI Tutor trên nền tảng VLearn. Học viên đang đọc một bước trong bài Lab thực hành về AI/LLM. Bạn được cung cấp TÀI LIỆU GỐC của bước hiện tại và các TIPS CHUẨN BỊ liên quan.\n\nNhiệm vụ: Tạo phần "Hướng Dẫn Cá Nhân Hóa" kết hợp kiến thức từ tài liệu gốc VÀ tips. Hãy:\n1. Giải thích các khái niệm kỹ thuật bằng ẩn dụ đời thường (ví dụ: gọi API giống gọi món nhà hàng).\n2. Tóm tắt "Tại sao cần làm bước này?" bằng ngôn ngữ bình dân.\n3. Liên kết nội dung bước hiện tại với các Tips chuẩn bị để học viên hiểu rõ mối quan hệ.\n4. Liệt kê lỗi phổ biến và cách phòng tránh.\n5. Đưa ra gợi ý thực tế giúp hiểu bài nhanh hơn.\nKHÔNG viết lại toàn bộ tài liệu. CHỈ viết phần hướng dẫn bổ sung. Trả về Markdown tiêu chuẩn.`;
+                } else {
+                    systemPrompt = baseSystemPrompt + `\n\n---\nBỐI CẢNH BỔ SUNG: Bạn đang đóng vai AI Tutor cao cấp trên VLearn. Học viên IT/SE đang đọc một bước trong bài Lab thực hành. Bạn được cung cấp TÀI LIỆU GỐC của bước hiện tại và các TIPS CHUẨN BỊ liên quan.\n\nNhiệm vụ: Tạo phần "Hướng Dẫn Kỹ Thuật Chuyên Sâu" kết hợp tài liệu gốc VÀ tips. Hãy:\n1. Phân tích Core Specifications, Constraints và Edge Cases liên quan.\n2. Cung cấp Code Snippet tham khảo hoặc lệnh Terminal cụ thể.\n3. Liên kết nội dung bước hiện tại với Tips chuẩn bị để chỉ ra best practices.\n4. Gợi ý tối ưu hiệu năng, bảo mật.\n5. Chỉ ra failure mode thường gặp và cách debug.\nKHÔNG viết lại toàn bộ tài liệu. CHỈ viết phần hướng dẫn chuyên sâu bổ sung. Trả về Markdown tiêu chuẩn.`;
+                }
+
+                let userPrompt = `Dưới đây là nội dung tài liệu gốc của bước học tập:\n\nTên bước: ${titleText}\n\nNội dung gốc:\n${originalContent}`;
                 
-                const responseMarkdown = await callRealLLM(systemPrompt, userPrompt);
-                const parsedHtml = marked.parse(responseMarkdown);
-
-                const fullHtml = `
-                    <div class="space-y-6">
-                        <div class="border-b border-slate-200 pb-4 flex justify-between items-center">
-                            <div>
-                                <span class="text-xs text-blue-600 font-semibold tracking-wide uppercase">Bản hướng dẫn cá nhân hóa (Bước ${stepNum})</span>
-                                <h2 class="text-2xl font-bold text-slate-900 mt-1">${type === 'non-it' ? '🔰 Bản Hướng Dẫn cho Non-IT' : '💻 Technical Deep-Dive for IT'}: ${titleText}</h2>
-                            </div>
-                            <button onclick="restoreOriginalGuide()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs transition cursor-pointer flex items-center gap-1 font-medium shadow-sm border-0">
-                                <i class="fa-solid fa-arrow-rotate-left"></i> Quay lại bản gốc
-                            </button>
-                        </div>
-                        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm text-xs leading-relaxed text-slate-700 markdown-content">
-                            ${parsedHtml}
-                        </div>
-                    </div>
-                `;
-
-                personalizedGuidesCache[type][stepNum] = fullHtml;
-
-                if (currentActiveStep === stepNum && currentPersonalizedMode === type) {
-                    mainContent.innerHTML = fullHtml;
+                if (relatedTipsContext) {
+                    userPrompt += `\n\n===== CÁC TIPS CHUẨN BỊ LIÊN QUAN =====\n${relatedTipsContext}`;
                 }
+
+                const responseMarkdown = await callRealLLM(systemPrompt, userPrompt);
+                const tipsHtml = marked.parse(responseMarkdown);
+
+                const tipsContent = document.getElementById('ai-tips-content');
+                if (tipsContent) {
+                    tipsContent.innerHTML = `<div class="text-xs leading-relaxed text-slate-700 markdown-content">${tipsHtml}</div>`;
+                }
+
+                // Cache the full page (with tips rendered)
+                personalizedGuidesCache[type][stepNum] = mainContent.innerHTML;
+
             } catch (err) {
                 console.error("Personalized guide error: ", err);
-                const errorHtml = `
-                    <div class="p-6 bg-red-50 border border-red-200 rounded-xl text-center space-y-4">
-                        <div class="text-red-600 text-2xl"><i class="fa-solid fa-circle-exclamation animate-bounce"></i></div>
-                        <h3 class="text-sm font-bold text-red-800">Không thể kết nối API AI để cá nhân hóa</h3>
-                        <p class="text-xs text-red-700">${err.message}</p>
-                        <button onclick="renderPersonalizedGuide('${type}', ${stepNum})" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold shadow transition cursor-pointer border-0">
-                            Thử lại
-                        </button>
-                    </div>
-                `;
-                mainContent.innerHTML = errorHtml;
+                const tipsContent = document.getElementById('ai-tips-content');
+                if (tipsContent) {
+                    tipsContent.innerHTML = `
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center space-y-3">
+                            <div class="text-red-600"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <p class="text-xs text-red-700 font-medium">Không thể tạo hướng dẫn cá nhân hóa: ${err.message}</p>
+                            <button onclick="renderPersonalizedGuide('${type}', ${stepNum})" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-semibold shadow transition cursor-pointer border-0">
+                                Thử lại
+                            </button>
+                        </div>
+                    `;
+                }
                 throw err;
             }
         }
