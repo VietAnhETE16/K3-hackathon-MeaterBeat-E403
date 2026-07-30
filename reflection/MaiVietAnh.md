@@ -11,9 +11,6 @@
 Trong suốt 1.5 ngày của Mini Hackathon, tôi chịu trách nhiệm chính trong các phần việc:
 - **Phát triển luồng logic (Flow Build):** Thiết lập cấu trúc luồng của ứng dụng trên `index.html` và `prototype.html`, liên kết logic chuyển bước bài học (Codelab Step Navigation) và quản lý cache hướng dẫn cá nhân hóa (`personalizedGuidesCache`).
 - **Tích hợp Real API OpenAI:** Lập trình hàm `callRealLLM` sử dụng mô hình `gpt-4o-mini`, nạp API key tự động từ `.env` hoặc cho phép người dùng nhập/ghi đè từ giao diện Header của Web.
-- **Xây dựng Cổng bảo mật (Safety Gateway):** Thiết kế cấu trúc tệp [anti-injection.md](file:///c:/Users/VIET%20ANH/Desktop/Batch03-K3-AI-Product-Hackathon/codebase/systemPrompt/anti-injection.md) ban đầu và điều phối hoạt động tích hợp cổng an toàn với Lương Đăng Doanh.
-- **Quản lý & Phân phối:** Điều phối công việc cho các thành viên trong nhóm theo mô hình phân công mới, đảm bảo tiến độ đẩy code lên GitHub và chuẩn bị các mốc Checkpoint đúng thời hạn.
-
 ---
 
 ## 2. Bài học lớn nhất rút ra về sản phẩm AI
