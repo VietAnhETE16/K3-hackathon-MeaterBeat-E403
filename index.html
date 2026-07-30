@@ -259,6 +259,10 @@
                     <span>Tiếng Việt</span>
                     <i class="fa-solid fa-chevron-down text-[9px] opacity-70"></i>
                 </button>
+                <button onclick="openFeedbackModal()" class="flex items-center gap-1.5 bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition font-semibold border-0 cursor-pointer" aria-haspopup="dialog">
+                    <i class="fa-regular fa-star text-[11px]"></i>
+                    Gửi feedback
+                </button>
                 <!-- Avatar indicator -->
                 <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-blue-600 font-bold flex items-center justify-center text-xs">
                     2
@@ -415,6 +419,56 @@
         </span>
     </button>
 
+    <!-- Feedback modal. The form submits to a Google Apps Script endpoint in a hidden iframe. -->
+    <div id="feedback-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/45 p-4" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+        <div class="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div class="flex items-start justify-between border-b border-slate-100 px-6 py-5">
+                <div>
+                    <h2 id="feedback-title" class="text-base font-bold text-slate-800">Đánh giá trải nghiệm Codelab</h2>
+                    <p class="mt-1 text-xs leading-relaxed text-slate-500">Đánh giá này được ghi nhận cho Codelab bạn đang học và giúp nhóm cải thiện hai chức năng chính.</p>
+                </div>
+                <button onclick="closeFeedbackModal()" class="-mr-2 -mt-1 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 border-0 bg-transparent cursor-pointer" aria-label="Đóng form feedback">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="feedback-form" class="space-y-5 px-6 py-5" onsubmit="submitFeedback(event)" target="feedback-submit-target" method="POST">
+                <input type="hidden" name="labTitle" id="feedback-lab-title">
+                <div>
+                    <label for="optimization-rating" class="block text-sm font-semibold leading-relaxed text-slate-700">Bạn đánh giá thế nào về chức năng tối ưu hoá thông tin Codelab theo background của mình?</label>
+                    <select id="optimization-rating" name="optimizationRating" required class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 focus:border-orange-500 focus:outline-none">
+                        <option value="" selected disabled>Chọn điểm đánh giá</option>
+                        <option value="1">1 — Rất chưa tốt</option>
+                        <option value="2">2 — Chưa tốt</option>
+                        <option value="3">3 — Tạm ổn</option>
+                        <option value="4">4 — Tốt</option>
+                        <option value="5">5 — Rất tốt</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="grouping-rating" class="block text-sm font-semibold leading-relaxed text-slate-700">Chức năng chia nhóm có hữu ích và tạo ra phân chia phù hợp với nhóm của bạn không?</label>
+                    <select id="grouping-rating" name="groupingRating" required class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 focus:border-orange-500 focus:outline-none">
+                        <option value="" selected disabled>Chọn điểm đánh giá</option>
+                        <option value="1">1 — Rất chưa tốt</option>
+                        <option value="2">2 — Chưa tốt</option>
+                        <option value="3">3 — Tạm ổn</option>
+                        <option value="4">4 — Tốt</option>
+                        <option value="5">5 — Rất tốt</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="feedback-comment" class="block text-sm font-semibold text-slate-700">Góp ý thêm <span class="font-normal text-slate-400">(không bắt buộc)</span></label>
+                    <textarea id="feedback-comment" name="comment" rows="3" maxlength="1000" placeholder="Điều gì nên được cải thiện?" class="mt-2 w-full resize-y rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none"></textarea>
+                </div>
+                <p id="feedback-status" class="hidden rounded-lg px-3 py-2 text-xs" role="status"></p>
+                <div class="flex justify-end gap-3 pt-1">
+                    <button type="button" onclick="closeFeedbackModal()" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Hủy</button>
+                    <button id="feedback-submit-button" type="submit" class="rounded-lg bg-orange-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-orange-500 cursor-pointer border-0">Gửi đánh giá</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <iframe id="feedback-submit-target" name="feedback-submit-target" class="hidden" title="Feedback submission target"></iframe>
+
     <!-- Javascript Logic -->
     <script>
         // State variables
@@ -476,7 +530,62 @@
         
         let currentLabId = '';
         let currentLabData = null;
+        let feedbackRequestPending = false;
         const codelabSteps = {};
+
+        function getFeedbackEndpoint() {
+            return typeof ENV_VARS !== 'undefined' ? ENV_VARS.GOOGLE_APPS_SCRIPT_URL : '';
+        }
+
+        function openFeedbackModal() {
+            const modal = document.getElementById('feedback-modal');
+            const form = document.getElementById('feedback-form');
+            const status = document.getElementById('feedback-status');
+            document.getElementById('feedback-lab-title').value = currentLabData ? currentLabData.title : '';
+            form.reset();
+            document.getElementById('feedback-lab-title').value = currentLabData ? currentLabData.title : '';
+            status.className = 'hidden rounded-lg px-3 py-2 text-xs';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeFeedbackModal() {
+            if (feedbackRequestPending) return;
+            const modal = document.getElementById('feedback-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+            const endpoint = getFeedbackEndpoint();
+            const status = document.getElementById('feedback-status');
+            const submitButton = document.getElementById('feedback-submit-button');
+
+            if (!endpoint || endpoint.includes('your-google-apps-script-web-app-url')) {
+                status.textContent = 'Chưa kết nối Google Sheets. Hãy cấu hình GOOGLE_APPS_SCRIPT_URL trong data/env.js.';
+                status.className = 'rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 border border-amber-200';
+                return;
+            }
+
+            const form = event.currentTarget;
+            form.action = endpoint;
+            feedbackRequestPending = true;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Đang gửi…';
+            status.textContent = 'Đánh giá đang được lưu.';
+            status.className = 'rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700 border border-blue-200';
+
+            const target = document.getElementById('feedback-submit-target');
+            target.addEventListener('load', () => {
+                feedbackRequestPending = false;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Đã gửi';
+                status.textContent = 'Cảm ơn bạn! Đánh giá đã được gửi tới Google Sheets.';
+                status.className = 'rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700 border border-emerald-200';
+            }, { once: true });
+            form.submit();
+        }
 
         // Custom callout block rendering configuration for marked.js
         const customRenderer = new marked.Renderer();
