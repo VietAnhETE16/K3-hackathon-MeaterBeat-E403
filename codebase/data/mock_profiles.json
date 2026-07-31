@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-07-30T14:56:11.305Z",
+  "generatedAt": "2026-07-31T03:10:19.477Z",
   "description": "Mock data giả lập hồ sơ năng lực, không đại diện cho người thật.",
-  "total": 501,
+  "total": 502,
   "skillCatalog": {
     "Engineering": [
       "Frontend",
@@ -20913,6 +20913,41 @@
       ],
       "interests": [
         "Nông nghiệp"
+      ],
+      "currentIndustry": "IT",
+      "yearsOfExperience": 0,
+      "availability": "part_time",
+      "location": "Remote",
+      "notes": "Hồ sơ được tạo từ form Chia Role Nhóm."
+    },
+    {
+      "id": "MP0502",
+      "displayName": "a",
+      "email": "mp0502@example.com",
+      "skills": [
+        {
+          "name": "Machine Learning",
+          "level": 3
+        },
+        {
+          "name": "NLP",
+          "level": 3
+        },
+        {
+          "name": "Team Leadership",
+          "level": 3
+        },
+        {
+          "name": "Communication",
+          "level": 3
+        }
+      ],
+      "desiredRoles": [
+        "Data/AI"
+      ],
+      "interests": [
+        "Đổi mới Sáng tạo",
+        "Phòng chống Thiên tai"
       ],
       "currentIndustry": "IT",
       "yearsOfExperience": 0,
