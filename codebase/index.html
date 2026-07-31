@@ -581,6 +581,7 @@
         let currentActiveStep = 1;
         let currentPersonalizedMode = 'original'; // 'original', 'non-it', 'it'
         let personalizedGuidesCache = { 'non-it': {}, 'it': {} };
+        let personalizedGuidesLoading = { 'non-it': {}, 'it': {} };
         
         let currentLabId = '';
         let currentLabData = null;
@@ -1251,6 +1252,7 @@
             currentActiveStep = 1;
             currentPersonalizedMode = 'original';
             personalizedGuidesCache = { 'non-it': {}, 'it': {} };
+            personalizedGuidesLoading = { 'non-it': {}, 'it': {} };
             selectedTeam = [];
             renderTeamList();
 
@@ -1263,6 +1265,7 @@
 
             rebuildCodelabSteps();
             setActiveStep(1);
+            preloadPersonalizedGuides();
         }
 
         function goBackToDashboard() {
@@ -1893,18 +1896,18 @@
 
             const aiMsg = document.createElement('div');
             aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm font-sans";
-            aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div id="personal-loading-msg"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Đang kết nối Real LLM API để tạo bản dịch cá nhân hóa...</div>`;
+            aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div class="personal-loading-msg"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Đang kết nối Real LLM API để tạo bản dịch cá nhân hóa...</div>`;
             chatBox.appendChild(aiMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
                 await renderPersonalizedGuide('non-it', currentActiveStep);
-                const loadingDiv = document.getElementById('personal-loading-msg');
+                const loadingDiv = aiMsg.querySelector('.personal-loading-msg');
                 if (loadingDiv) {
                     loadingDiv.innerHTML = `Đã chuyển đổi thành công! Toàn bộ các bước của Codelab đã được chuyển sang chế độ <strong>Non-IT</strong>. Bạn có thể bấm các bước khác ở cột bên trái để xem nội dung dịch tương ứng.`;
                 }
             } catch (err) {
-                const loadingDiv = document.getElementById('personal-loading-msg');
+                const loadingDiv = aiMsg.querySelector('.personal-loading-msg');
                 if (loadingDiv) {
                     loadingDiv.innerHTML = `<span class="text-red-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Lỗi: ${err.message}</span>`;
                 }
@@ -1922,31 +1925,66 @@
 
             const aiMsg = document.createElement('div');
             aiMsg.className = "bg-white border border-slate-200 p-3 rounded-xl text-slate-700 space-y-1.5 shadow-sm font-sans";
-            aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div id="personal-loading-msg"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Đang kết nối Real LLM API để tạo bản dịch cá nhân hóa...</div>`;
+            aiMsg.innerHTML = `<div class="font-bold text-orange-600 flex items-center gap-1"><i class="fa-solid fa-robot"></i> AI Tutor:</div><div class="personal-loading-msg"><i class="fa-solid fa-spinner animate-spin mr-1.5"></i> Đang kết nối Real LLM API để tạo bản dịch cá nhân hóa...</div>`;
             chatBox.appendChild(aiMsg);
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
                 await renderPersonalizedGuide('it', currentActiveStep);
-                const loadingDiv = document.getElementById('personal-loading-msg');
+                const loadingDiv = aiMsg.querySelector('.personal-loading-msg');
                 if (loadingDiv) {
                     loadingDiv.innerHTML = `Đã chuyển đổi thành công! Toàn bộ các bước của Codelab đã được chuyển sang chế độ <strong>Technical IT</strong>. Bạn có thể bấm các bước khác ở cột bên trái để xem nội dung dịch tương ứng.`;
                 }
             } catch (err) {
-                const loadingDiv = document.getElementById('personal-loading-msg');
+                const loadingDiv = aiMsg.querySelector('.personal-loading-msg');
                 if (loadingDiv) {
                     loadingDiv.innerHTML = `<span class="text-red-500"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Lỗi: ${err.message}</span>`;
                 }
             }
         }
 
-        async function renderPersonalizedGuide(type, stepNum) {
+        // Prepare both guide variants in the background.  Nothing is rendered until
+        // the learner explicitly chooses a variant from the two buttons.
+        function preloadPersonalizedGuides() {
+            const stepNum = currentActiveStep;
+            const loadingCache = personalizedGuidesLoading;
+            const preloadGuide = (type) => {
+                const request = renderPersonalizedGuide(type, stepNum, false);
+                loadingCache[type][stepNum] = request.finally(() => {
+                    delete loadingCache[type][stepNum];
+                });
+                return request;
+            };
+
+            Promise.allSettled([
+                preloadGuide('non-it'),
+                preloadGuide('it')
+            ]).catch(() => {
+                // Individual guide errors are handled when the learner opens it.
+            });
+        }
+
+        async function renderPersonalizedGuide(type, stepNum, shouldRender = true) {
             const mainContent = document.getElementById('main-content-area');
             if (!mainContent) return;
+            const guideLabId = currentLabId;
 
             // Check Cache
             if (personalizedGuidesCache[type] && personalizedGuidesCache[type][stepNum]) {
-                mainContent.innerHTML = personalizedGuidesCache[type][stepNum];
+                if (shouldRender) {
+                    mainContent.innerHTML = personalizedGuidesCache[type][stepNum];
+                }
+                return;
+            }
+
+            // If this version is already being prepared in the background, reuse
+            // that request instead of calling the LLM a second time on click.
+            const pendingGuide = personalizedGuidesLoading[type]?.[stepNum];
+            if (shouldRender && pendingGuide) {
+                await pendingGuide;
+                if (personalizedGuidesCache[type]?.[stepNum]) {
+                    mainContent.innerHTML = personalizedGuidesCache[type][stepNum];
+                }
                 return;
             }
 
@@ -2058,7 +2096,9 @@
                 </div>
             `;
 
-            mainContent.innerHTML = pageHtml;
+            if (shouldRender) {
+                mainContent.innerHTML = pageHtml;
+            }
 
             try {
                 // Get the appropriate system prompt from SYSTEM_PROMPTS
@@ -2129,18 +2169,22 @@
                     </div>
                 `;
 
+                // Do not let a background request from a previously opened lab
+                // populate the cache for the lab that is currently open.
+                if (currentLabId !== guideLabId) return;
+
                 // Cache the full page (with tips rendered)
                 personalizedGuidesCache[type][stepNum] = fullHtml;
 
                 // Update the DOM only if the user is still on the same step and mode
-                if (currentActiveStep === stepNum && currentPersonalizedMode === type) {
+                if (shouldRender && currentActiveStep === stepNum && currentPersonalizedMode === type) {
                     mainContent.innerHTML = fullHtml;
                 }
 
             } catch (err) {
                 console.error("Personalized guide error: ", err);
                 // Update only if still on the same step and mode
-                if (currentActiveStep === stepNum && currentPersonalizedMode === type) {
+                if (shouldRender && currentActiveStep === stepNum && currentPersonalizedMode === type) {
                     const tipsContent = document.getElementById('ai-tips-content');
                     if (tipsContent) {
                         tipsContent.innerHTML = `
