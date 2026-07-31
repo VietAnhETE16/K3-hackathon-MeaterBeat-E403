@@ -1,8 +1,0 @@
-.DS_Store
-node_modules/
-*.env
-*env.js
-/.vscode
-codebase/package.json
-
-codebase/data/vlearn-pack/
