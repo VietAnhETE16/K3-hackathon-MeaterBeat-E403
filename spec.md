@@ -137,4 +137,6 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 | :--- | :--- | :--- |
 | **30/07/2026 17:00** | Cấu hình System Prompt chặn cứng y tế, tài chính, logistics | Tránh rủi ro pháp lý và nâng cao tính an toàn của mô hình đối với các câu hỏi ngoài phạm vi (ID 26, 27, 28, 29, 30). |
 | **30/07/2026 17:15** | Tích hợp dữ liệu khảo sát thực tế (84 phản hồi) vào Spec | Bổ sung bằng chứng định lượng thực tế để chứng minh tính thuyết phục của bài toán phân chia vai trò nhóm. |
+| **31/07/2026 10:00** | Đồng bộ hóa Hồ sơ năng lực (My Profile) cá nhân hóa cho AI Tutor Q&A | Nhận diện & cá nhân hóa ngôn ngữ theo trình độ học viên (feedback từ chị Minh Anh trong validation log). |
+
 

@@ -263,9 +263,91 @@
                     <i class="fa-regular fa-star text-[11px]"></i>
                     Gửi feedback
                 </button>
-                <!-- Avatar indicator -->
-                <div class="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 text-blue-600 font-bold flex items-center justify-center text-xs">
-                    2
+                <!-- My Profile Dropdown -->
+                <div class="relative" id="header-profile-container">
+                    <button onclick="toggleGlobalProfileEditor()" class="flex items-center space-x-1.5 bg-white border border-slate-200 text-slate-700 px-3 py-1.5 rounded-full hover:border-slate-300 transition font-semibold cursor-pointer border-0 shadow-sm">
+                        <i class="fa-solid fa-user-tie text-orange-600"></i>
+                        <span id="global-profile-name">Hồ sơ của tôi</span>
+                        <i class="fa-solid fa-chevron-down text-[8px] opacity-60"></i>
+                    </button>
+                    <!-- COLLAPSIBLE PROFILE EDITOR FORM -->
+                    <div id="global-profile-editor" class="hidden absolute right-0 mt-2 w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 z-50 text-left space-y-3 text-slate-800">
+                        <div class="font-bold text-slate-700 flex items-center justify-between border-b pb-2 border-slate-100">
+                            <span>Cấu Hình Hồ Sơ Cá Nhân</span>
+                            <span id="global-profile-id-badge" class="text-[9px] bg-orange-50 text-orange-600 border border-orange-200 px-1 py-0.5 rounded font-mono font-medium">MP0000</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-medium" id="global-profile-meta">Ngành: -- | Trình độ: --</div>
+
+                        <!-- Dropdown select existing student -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Chọn nhanh từ Database:</label>
+                            <select id="global-profile-select-db" onchange="loadStudentToGlobalProfile(this.value)" class="w-full bg-white border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-orange-500 transition">
+                                <option value="">-- Chọn học viên từ danh sách mock --</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500">TÊN HIỂN THỊ:</label>
+                                <input type="text" id="global-profile-name-input" placeholder="Tên hiển thị" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500">EMAIL:</label>
+                                <input type="email" id="global-profile-email-input" placeholder="Email" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500">NGÀNH CÔNG TÁC:</label>
+                                <select id="global-profile-industry-input" class="w-full bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-705 focus:outline-none focus:border-orange-500 transition">
+                                    <!-- Will load dynamically -->
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500">KINH NGHIỆM (NĂM):</label>
+                                <input type="number" id="global-profile-experience-input" min="0" value="0" class="w-full bg-white border border-slate-200 rounded px-2.5 py-1 text-xs text-slate-800 focus:outline-none focus:border-orange-500 transition">
+                            </div>
+                        </div>
+
+                        <!-- Skills Sliders (Rendered dynamically) -->
+                        <div class="space-y-2">
+                            <div class="font-bold text-[10px] text-slate-500 uppercase font-semibold">Cấp Độ Kỹ Năng (1-5):</div>
+                            <div id="global-profile-skills-container" class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-1 bg-slate-100/50 rounded border border-slate-200">
+                                <!-- Rendered dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Roles and Interests selection -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block font-semibold">Vai trò mong muốn:</label>
+                                <div id="global-profile-roles-container" class="flex flex-wrap gap-1 max-h-24 overflow-y-auto p-1 bg-white border rounded">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-slate-500 uppercase block font-semibold">Mối quan tâm:</label>
+                                <div id="global-profile-interests-container" class="flex flex-wrap gap-1 max-h-24 overflow-y-auto p-1 bg-white border rounded">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-500 font-semibold">GHI CHÚ NĂNG LỰC / MỤC TIÊU:</label>
+                            <textarea id="global-profile-notes-input" rows="2" placeholder="Ghi chú thêm về bản thân..." class="w-full bg-white border border-slate-200 rounded px-2 py-1 text-xs text-slate-850 focus:outline-none focus:border-orange-500 transition"></textarea>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="saveGlobalProfileFromForm()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white font-semibold py-2 px-3 rounded transition flex items-center justify-center gap-1 cursor-pointer border-0 shadow">
+                                <i class="fa-solid fa-floppy-disk"></i> Lưu Hồ Sơ
+                            </button>
+                            <button id="btn-add-me-to-team" onclick="addMeToTeam()" disabled class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-3 rounded transition flex items-center justify-center gap-1 cursor-pointer border-0 shadow opacity-50 cursor-not-allowed">
+                                <i class="fa-solid fa-user-plus"></i> Vào nhóm
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -451,6 +533,25 @@
                             <div id="role-cards-container" class="space-y-2">
                                 <!-- Dynamic Role Output -->
                             </div>
+                            <div id="role-rationale-table" class="hidden mt-4 space-y-2">
+                                <div class="font-bold text-slate-850 flex items-center gap-1.5 border-b pb-1 text-[11px] uppercase tracking-wider">
+                                    <i class="fa-solid fa-list-check text-blue-500"></i> Bảng Giải Thích Phân Chia:
+                                </div>
+                                <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                                    <table class="w-full text-left text-xs border-collapse">
+                                        <thead>
+                                            <tr class="bg-slate-50 border-b border-slate-200">
+                                                <th class="p-2 font-bold text-slate-600">Học viên</th>
+                                                <th class="p-2 font-bold text-slate-600">Vai trò</th>
+                                                <th class="p-2 font-bold text-slate-600">Cơ sở thế mạnh & Lý do</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="role-rationale-tbody" class="divide-y divide-slate-100 text-slate-700">
+                                            <!-- Dynamically generated rows -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -573,6 +674,8 @@
         };
 
         let selectedTeam = [];
+        let globalActiveProfile = null; // Stores current active user profile
+        let globalProfileEditorOpen = false;
         let isAddStudentFormOpen = false;
         const newStudentSkillLevels = {};
         const newStudentDesiredRoles = new Set();
@@ -782,6 +885,305 @@
             });
             refreshNewStudentFormOptions();
             updateNextStudentIdBadge();
+            initGlobalProfile();
+        }
+
+        function initGlobalProfile() {
+            // Populate select database dropdown
+            const select = document.getElementById('global-profile-select-db');
+            if (select) {
+                select.innerHTML = '<option value="">-- Chọn học viên từ danh sách mock --</option>';
+                if (mockProfilesData && mockProfilesData.profiles) {
+                    mockProfilesData.profiles.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.innerText = `${p.displayName} (${p.id})`;
+                        select.appendChild(opt);
+                    });
+                }
+            }
+
+            // Populate industry dropdown
+            const indSelect = document.getElementById('global-profile-industry-input');
+            if (indSelect && mockProfilesData && mockProfilesData.industryOptions) {
+                indSelect.innerHTML = '';
+                mockProfilesData.industryOptions.forEach(ind => {
+                    const opt = document.createElement('option');
+                    opt.value = ind;
+                    opt.innerText = ind;
+                    indSelect.appendChild(opt);
+                });
+            }
+
+            // Load persisted active global profile or set first mock profile as default
+            let cached = localStorage.getItem('active_global_profile');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    // Check if it exists in mockProfilesData
+                    const exists = mockProfilesData.profiles.find(p => p.id === parsed.id);
+                    if (exists) {
+                        setActiveGlobalProfile(exists);
+                        return;
+                    }
+                } catch(e) {
+                    console.error("Error parsing cached profile", e);
+                }
+            }
+
+            if (mockProfilesData && mockProfilesData.profiles && mockProfilesData.profiles.length > 0) {
+                setActiveGlobalProfile(mockProfilesData.profiles[0]);
+            }
+        }
+
+        function setActiveGlobalProfile(profile) {
+            globalActiveProfile = JSON.parse(JSON.stringify(profile));
+            localStorage.setItem('active_global_profile', JSON.stringify(globalActiveProfile));
+
+            // Update UI Summary Header
+            document.getElementById('global-profile-name').innerText = globalActiveProfile.displayName || globalActiveProfile.name;
+            
+            // Determine if they are Technical IT
+            let techSkillLevels = [];
+            const techSkillNames = ['Frontend', 'Backend', 'Mobile', 'DevOps/Cloud', 'Machine Learning', 'NLP', 'Computer Vision', 'Data Analysis', 'Data Engineering', 'Prompt Engineering'];
+            if (globalActiveProfile.skills && Array.isArray(globalActiveProfile.skills)) {
+                globalActiveProfile.skills.forEach(s => {
+                    if (techSkillNames.includes(s.name)) {
+                        techSkillLevels.push(s.level);
+                    }
+                });
+            }
+            const avgTechLevel = techSkillLevels.length > 0 ? (techSkillLevels.reduce((a, b) => a + b, 0) / techSkillLevels.length) : 0;
+            const nonTechIndustries = ['Y tế', 'Nông nghiệp', 'Tài chính - Ngân hàng', 'Logistics', 'Bán lẻ', 'Sản xuất', 'Truyền thông', 'Tư vấn', 'Nhà nước', 'Sinh viên'];
+            const isNonIT = nonTechIndustries.includes(globalActiveProfile.currentIndustry) || (avgTechLevel > 0 && avgTechLevel < 2.5);
+            const isSenior = avgTechLevel >= 4.0;
+            
+            let bgText = 'Technical IT';
+            if (isNonIT) bgText = 'Non-IT';
+            else if (isSenior) bgText = 'Senior IT';
+            else bgText = 'Fresher IT';
+
+            const skillSummary = globalActiveProfile.skills.slice(0, 3).map(s => `${s.name}: ${s.level}`).join(', ');
+            document.getElementById('global-profile-meta').innerText = `Ngành: ${globalActiveProfile.currentIndustry || 'Chưa rõ'} | ${bgText} | ${skillSummary}`;
+
+            // Update Add me to team button
+            const btnAddMe = document.getElementById('btn-add-me-to-team');
+            if (btnAddMe) {
+                btnAddMe.disabled = false;
+                btnAddMe.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // Sync with editor values if editor is open
+            if (globalProfileEditorOpen) {
+                syncGlobalProfileEditorForm();
+            }
+        }
+
+        function toggleGlobalProfileEditor() {
+            const editor = document.getElementById('global-profile-editor');
+            if (!editor) return;
+            globalProfileEditorOpen = !globalProfileEditorOpen;
+            if (globalProfileEditorOpen) {
+                editor.classList.remove('hidden');
+                syncGlobalProfileEditorForm();
+            } else {
+                editor.classList.add('hidden');
+            }
+        }
+
+        function syncGlobalProfileEditorForm() {
+            if (!globalActiveProfile) return;
+            document.getElementById('global-profile-id-badge').innerText = globalActiveProfile.id || 'MP----';
+            document.getElementById('global-profile-name-input').value = globalActiveProfile.displayName || globalActiveProfile.name || '';
+            document.getElementById('global-profile-email-input').value = globalActiveProfile.email || '';
+            document.getElementById('global-profile-industry-input').value = globalActiveProfile.currentIndustry || '';
+            document.getElementById('global-profile-experience-input').value = globalActiveProfile.yearsOfExperience || 0;
+            document.getElementById('global-profile-notes-input').value = globalActiveProfile.notes || '';
+
+            renderGlobalProfileEditorSkills();
+            renderGlobalProfileEditorOptions();
+        }
+
+        function renderGlobalProfileEditorSkills() {
+            const container = document.getElementById('global-profile-skills-container');
+            if (!container || !mockProfilesData || !mockProfilesData.skillCatalog) return;
+
+            let html = '';
+            for (const cat in mockProfilesData.skillCatalog) {
+                mockProfilesData.skillCatalog[cat].forEach(skill => {
+                    const pSkill = globalActiveProfile.skills.find(s => s.name === skill);
+                    const currentLevel = pSkill ? pSkill.level : 1;
+                    const hasSkill = !!pSkill;
+
+                    html += `
+                    <div class="flex flex-col p-1.5 bg-white border border-slate-100 rounded space-y-1">
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-1 cursor-pointer font-semibold text-[10px]">
+                                <input type="checkbox" id="chk-gskill-${skill}" ${hasSkill ? 'checked' : ''} onchange="toggleGlobalProfileSkill('${skill}')" class="accent-orange-600">
+                                <span>${skill}</span>
+                            </label>
+                            <span id="lbl-gskill-${skill}" class="text-[9px] font-mono text-slate-500 font-bold">${currentLevel}/5</span>
+                        </div>
+                        <input type="range" id="sld-gskill-${skill}" min="1" max="5" value="${currentLevel}" ${hasSkill ? '' : 'disabled'} oninput="updateGlobalProfileSkillLevelValue('${skill}', this.value)" class="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-600">
+                    </div>`;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        function renderGlobalProfileEditorOptions() {
+            // Roles
+            const rolesContainer = document.getElementById('global-profile-roles-container');
+            if (rolesContainer && mockProfilesData && mockProfilesData.roleOptions) {
+                let html = '';
+                mockProfilesData.roleOptions.forEach(role => {
+                    const isSelected = globalActiveProfile.desiredRoles && globalActiveProfile.desiredRoles.includes(role);
+                    html += `
+                    <label class="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-[10px] cursor-pointer">
+                        <input type="checkbox" name="global-desired-roles" value="${role}" ${isSelected ? 'checked' : ''} class="accent-orange-600 text-[10px]">
+                        <span>${role}</span>
+                    </label>`;
+                });
+                rolesContainer.innerHTML = html;
+            }
+
+            // Interests
+            const interestsContainer = document.getElementById('global-profile-interests-container');
+            if (interestsContainer && mockProfilesData && mockProfilesData.interestOptions) {
+                let html = '';
+                mockProfilesData.interestOptions.forEach(interest => {
+                    const isSelected = globalActiveProfile.interests && globalActiveProfile.interests.includes(interest);
+                    html += `
+                    <label class="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-[10px] cursor-pointer">
+                        <input type="checkbox" name="global-interests" value="${interest}" ${isSelected ? 'checked' : ''} class="accent-orange-600 text-[10px]">
+                        <span>${interest}</span>
+                    </label>`;
+                });
+                interestsContainer.innerHTML = html;
+            }
+        }
+
+        function toggleGlobalProfileSkill(skill) {
+            const chk = document.getElementById(`chk-gskill-${skill}`);
+            const sld = document.getElementById(`sld-gskill-${skill}`);
+            if (chk && sld) {
+                sld.disabled = !chk.checked;
+            }
+        }
+
+        function updateGlobalProfileSkillLevelValue(skill, val) {
+            const lbl = document.getElementById(`lbl-gskill-${skill}`);
+            if (lbl) {
+                lbl.innerText = `${val}/5`;
+            }
+        }
+
+        function loadStudentToGlobalProfile(studentId) {
+            if (!studentId) return;
+            const student = mockProfilesData.profiles.find(p => p.id === studentId);
+            if (student) {
+                setActiveGlobalProfile(student);
+            }
+        }
+
+        function saveGlobalProfileFromForm() {
+            if (!globalActiveProfile) return;
+
+            const name = document.getElementById('global-profile-name-input').value.trim();
+            if (!name) {
+                alert('Tên hiển thị không được để trống!');
+                return;
+            }
+
+            globalActiveProfile.displayName = name;
+            globalActiveProfile.name = name;
+            globalActiveProfile.email = document.getElementById('global-profile-email-input').value.trim();
+            globalActiveProfile.currentIndustry = document.getElementById('global-profile-industry-input').value;
+            globalActiveProfile.yearsOfExperience = Number(document.getElementById('global-profile-experience-input').value) || 0;
+            globalActiveProfile.notes = document.getElementById('global-profile-notes-input').value.trim();
+
+            // Collect skills
+            const collectedSkills = [];
+            if (mockProfilesData && mockProfilesData.skillCatalog) {
+                for (const cat in mockProfilesData.skillCatalog) {
+                    mockProfilesData.skillCatalog[cat].forEach(skill => {
+                        const chk = document.getElementById(`chk-gskill-${skill}`);
+                        if (chk && chk.checked) {
+                            const sld = document.getElementById(`sld-gskill-${skill}`);
+                            const level = sld ? Number(sld.value) : 1;
+                            
+                            // Map cat type for compatibility
+                            let catType = 'eng';
+                            const nameLower = skill.toLowerCase();
+                            if (nameLower.includes('nlp') || nameLower.includes('learning') || nameLower.includes('prompt') || nameLower.includes('ai') || nameLower.includes('data')) {
+                                catType = 'ai';
+                            } else if (nameLower.includes('design') || nameLower.includes('ui') || nameLower.includes('ux') || nameLower.includes('graphic')) {
+                                catType = 'design';
+                            } else if (nameLower.includes('lead') || nameLower.includes('communication') || nameLower.includes('project') || nameLower.includes('product')) {
+                                catType = 'lead';
+                            } else if (nameLower.includes('testing') || nameLower.includes('qa') || nameLower.includes('automation')) {
+                                catType = 'qa';
+                            }
+
+                            collectedSkills.push({ name: skill, level: level, cat: catType });
+                        }
+                    });
+                }
+            }
+            globalActiveProfile.skills = collectedSkills;
+
+            // Collect desired roles
+            const roles = [];
+            const roleChecks = document.getElementsByName('global-desired-roles');
+            roleChecks.forEach(chk => {
+                if (chk.checked) roles.push(chk.value);
+            });
+            globalActiveProfile.desiredRoles = roles;
+
+            // Collect interests
+            const interests = [];
+            const interestChecks = document.getElementsByName('global-interests');
+            interestChecks.forEach(chk => {
+                if (chk.checked) interests.push(chk.value);
+            });
+            globalActiveProfile.interests = interests;
+
+            // Save back into mockDatabase and local cache
+            mockDatabase[globalActiveProfile.id] = {
+                id: globalActiveProfile.id,
+                name: globalActiveProfile.displayName,
+                skills: globalActiveProfile.skills
+            };
+
+            // Update in mockProfilesData for completeness
+            const idx = mockProfilesData.profiles.findIndex(p => p.id === globalActiveProfile.id);
+            if (idx !== -1) {
+                mockProfilesData.profiles[idx] = JSON.parse(JSON.stringify(globalActiveProfile));
+            } else {
+                mockProfilesData.profiles.push(JSON.parse(JSON.stringify(globalActiveProfile)));
+            }
+            saveProfilesData();
+
+            setActiveGlobalProfile(globalActiveProfile);
+            toggleGlobalProfileEditor(); // collapse form on success
+            alert('Đã cập nhật hồ sơ cá nhân thành công!');
+        }
+
+        function addMeToTeam() {
+            if (!globalActiveProfile) return;
+            const isAlreadySelected = selectedTeam.some(s => s.id === globalActiveProfile.id);
+            if (isAlreadySelected) {
+                alert('Học viên này đã có trong danh sách nhóm!');
+                return;
+            }
+            // Add to selectedTeam
+            selectedTeam.push({
+                id: globalActiveProfile.id,
+                name: globalActiveProfile.displayName || globalActiveProfile.name,
+                skills: globalActiveProfile.skills
+            });
+            renderTeamList();
+            alert('Đã thêm hồ sơ cá nhân của bạn vào danh sách nhóm!');
         }
 
         function flattenSkillCatalog() {
@@ -1680,7 +2082,7 @@
                 // Construct Context B: Selected team
                 const contextB = JSON.stringify(selectedTeam, null, 2);
 
-                const systemPrompt = `Bạn là Chuyên gia Điều phối Nhân sự dự án AI trên VLearn. Nhiệm vụ của bạn là đọc các Tasks (công việc cần làm) của bài Lab hiện tại và danh sách học viên (kèm theo các kỹ năng/level cụ thể của họ) để tự động phân chia công việc tối ưu nhất. Hãy gán vai trò tương thích cho từng người, đảm bảo mỗi người được phân công nhiệm vụ phù hợp với thế mạnh kỹ năng của họ. Trả về kết quả dưới định dạng JSON có cấu trúc mảng (array) các object như sau để hệ thống dễ dàng phân tích: [ { "studentId": "...", "studentName": "...", "role": "...", "tasks": [ "nhiệm vụ cụ thể 1", "nhiệm vụ cụ thể 2" ] } ]. Trả về CHỈ duy nhất chuỗi JSON hợp lệ đó, không kèm theo bất kỳ văn bản giải thích hay markdown tags (như \`\`\`json).`;
+                const systemPrompt = `Bạn là Chuyên gia Điều phối Nhân sự dự án AI trên VLearn. Nhiệm vụ của bạn là đọc các Tasks (công việc cần làm) của bài Lab hiện tại và danh sách học viên (kèm theo các kỹ năng/level cụ thể của họ) để tự động phân chia công việc tối ưu nhất. Hãy gán vai trò tương thích cho từng người, đảm bảo mỗi người được phân công nhiệm vụ phù hợp với thế mạnh kỹ năng của họ. Trả về kết quả dưới định dạng JSON có cấu trúc mảng (array) các object như sau để hệ thống dễ dàng phân tích: [ { "studentId": "...", "studentName": "...", "role": "...", "tasks": [ "nhiệm vụ cụ thể 1", "nhiệm vụ cụ thể 2" ], "rationale": "Giải thích ngắn gọn lý do giao vai này dựa trên kỹ năng/mong muốn nào" } ]. Trả về CHỈ duy nhất chuỗi JSON hợp lệ đó, không kèm theo bất kỳ văn bản giải thích hay markdown tags (như \`\`\`json).`;
                 const userPrompt = `Dưới đây là các tasks bài Lab:\n${contextA}\n\nDanh sách học viên:\n${contextB}`;
 
                 const responseText = await callRealLLM(systemPrompt, userPrompt);
@@ -1717,6 +2119,26 @@
                 });
 
                 container.innerHTML = html;
+
+                // Render Rationale Table
+                const rationaleTable = document.getElementById('role-rationale-table');
+                const rationaleTbody = document.getElementById('role-rationale-tbody');
+                if (rationaleTable && rationaleTbody) {
+                    let tbodyHtml = '';
+                    assignments.forEach(assign => {
+                        const rationaleText = assign.rationale || 'Được gán dựa trên phân tích năng lực mặc định.';
+                        tbodyHtml += `
+                            <tr class="border-b border-slate-100 hover:bg-slate-50">
+                                <td class="p-2 font-bold text-slate-800 text-[11px]">${assign.studentName}</td>
+                                <td class="p-2"><span class="bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${assign.role}</span></td>
+                                <td class="p-2 text-slate-600 leading-normal text-[11px]">${rationaleText}</td>
+                            </tr>
+                        `;
+                    });
+                    rationaleTbody.innerHTML = tbodyHtml;
+                    rationaleTable.classList.remove('hidden');
+                }
+
                 if (resultBox) resultBox.classList.remove('hidden');
             } catch (err) {
                 console.error("Role Assignment API Error:", err);
