@@ -234,7 +234,7 @@
     <!-- 2. CODELAB VIEW (HIDDEN BY DEFAULT) -->
     <div id="codelab-view" class="w-full h-full flex flex-col overflow-hidden hidden">
         <!-- Top Navigation Bar (Real Codelab Design) -->
-        <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
+        <header class="min-h-14 bg-white border-b border-slate-200 flex items-center justify-between gap-y-2 px-6 py-2 shrink-0 z-10">
             <div class="flex items-center space-x-3">
                 <button onclick="goBackToDashboard()" class="text-slate-500 hover:text-slate-900 transition mr-2 cursor-pointer p-1.5 hover:bg-slate-100 rounded-full flex items-center justify-center border-0 bg-transparent">
                     <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -243,9 +243,11 @@
             </div>
 
             <div class="flex items-center space-x-4 text-xs">
-                <!-- Mock Student Database tag -->
-                <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
-                    <i class="fa-solid fa-database text-[10px]"></i> Database: <span id="db-status-badge">Loaded</span>
+                <!-- Expected output for the lab currently being studied -->
+                <span id="lab-output-expectation" class="max-w-[460px] bg-violet-50 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-xl flex items-start gap-1.5 font-medium" title="Chọn một bài lab để xem đầu ra mong đợi.">
+                    <i class="fa-solid fa-bullseye text-[10px]"></i>
+                    <span class="shrink-0">Output expectation:</span>
+                    <span id="lab-output-expectation-text" class="min-w-0 whitespace-normal leading-tight" aria-live="polite">Chọn một bài lab</span>
                 </span>
                 <!-- Time Capsule -->
                 <div class="flex items-center space-x-1.5 bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-full font-mono text-[11px] font-medium">
@@ -1647,6 +1649,7 @@
             currentLabData = CODELABS_DATA[labId];
 
             document.getElementById('codelab-header-title').innerText = currentLabData.title;
+            updateLabOutputExpectation(currentLabData);
 
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('codelab-view').classList.remove('hidden');
@@ -1668,6 +1671,20 @@
             rebuildCodelabSteps();
             setActiveStep(1);
             preloadPersonalizedGuides();
+        }
+
+        function updateLabOutputExpectation(lab) {
+            const expectation = document.getElementById('lab-output-expectation');
+            const expectationText = document.getElementById('lab-output-expectation-text');
+            if (!expectation || !expectationText) return;
+
+            const outcomes = Array.isArray(lab.outcomes) ? lab.outcomes.filter(Boolean) : [];
+            const primaryOutcome = outcomes[0] || lab.description || 'Hoàn thành yêu cầu của bài lab.';
+
+            expectationText.innerText = primaryOutcome;
+            expectation.title = outcomes.length
+                ? `Đầu ra mong đợi:\n• ${outcomes.join('\n• ')}`
+                : `Đầu ra mong đợi: ${primaryOutcome}`;
         }
 
         function goBackToDashboard() {
