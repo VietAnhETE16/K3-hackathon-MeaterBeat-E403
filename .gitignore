@@ -3,5 +3,5 @@ node_modules/
 *.env
 *env.js
 /.vscode
-
+*package-lock.json
 codebase/data/vlearn-pack/
