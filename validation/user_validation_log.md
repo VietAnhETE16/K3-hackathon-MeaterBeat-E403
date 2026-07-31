@@ -14,7 +14,7 @@ Tài liệu ghi nhận kết quả thử nghiệm sản phẩm thực tế với
 
 | Người thử (Tên/Vai — Willing user?) | Task giao cho user | Quan sát của nhóm (Họ bấm gì, kẹt ở đâu) | Quote nguyên văn (Ý kiến của user sau 3 câu hỏi) | Mức nghiêm trọng (Low/Medium/High) |
 | :--- | :--- | :--- | :--- | :--- |
-| Chị Minh Anh<br>(Lab Coach - Willing User) | Test thử demo | Quan sát thao tác của nhóm | "Mình thích ý tưởng của bạn đó sợ không hoàn thiện được trong deadline" | Medium |
+| Chị Minh Anh<br>(Lab Coach - Willing User) | Test thử demo | Quan sát thao tác của nhóm | "phần chatbot hỏi đáp thêm phần config kinh nghiệm của user như bên phần xếp role" | Medium |
 | Anh Hoàng Hiệp<br>(Lab Coach - willing user) | Kiểm tra giao diện tổng thể và chức năng | Nhấm đúng vào Icon AI, sử dụng đúng tab AI tutor | "Anh thấy phần UI đẹp rồi nhưng AI còn chậm" | Medium |
 | Bạn nam G25<br>(Học viên) | Kiểm tra mục giải đáp, chia nhóm của AI  | Đọc phần nội dung cho người non-IT và đặt câu hỏi dựa trên đó | "Mình thấy demo này ok rồi đấy" | Low |
 | Bạn nữ G25<br>(Học viên) | Kiểm tra sự phù hợp của nội dung cho người non-IT | Nhấn nhiều lần và cần giải thích qua | "Ừm mình thấy nó hợp lý rồi đấy" | Low |
@@ -25,12 +25,16 @@ Tài liệu ghi nhận kết quả thử nghiệm sản phẩm thực tế với
 ## 2. Tổng hợp Kết luận (4 dòng bắt buộc)
 
 1. **Chủ đề lặp lại nhiều nhất:**
-   - Người dùng đánh giá cao giao diện UI trực quan, đẹp mắt và chế độ dịch "Non-IT" dễ hiểu. Tuy nhiên, trở ngại lớn nhất là tốc độ phản hồi của AI Tutor còn hơi chậm (feedback từ anh Hoàng Hiệp) và người dùng mới cần một chút chỉ dẫn ban đầu để biết cách thao tác chuyển đổi chế độ hoặc chia role (feedback từ các bạn học viên nữ G25, E402).
-2. **1-2 thay đổi sẽ thực hiện trước demo (ghi nhận vào §9 Changelog của [spec.md](file:///Users/tdu/K3-hackathon-MeaterBeat-E403/spec.md)):**
-   - *Thay đổi 1:* Thêm hướng dẫn nhanh (Helper Tooltip) mô tả cách bấm nút dịch và nút chia nhóm ngay trên Widget chat để người dùng mới không cần người khác giải thích qua.
-   - *Thay đổi 2:* Tối ưu lại giao diện Loading State (thêm animation spinner/skeleton) trong thời gian đợi AI Tutor phản hồi để người dùng biết hệ thống đang xử lý, giảm cảm giác bị trễ.
+  - Người dùng đánh giá cao giao diện UI đẹp mắt, trực quan và nội dung phân phối cho Non-IT/IT của chế độ dịch.
+   - Các trở ngại và đề xuất nổi bật:
+     - Đề xuất tích hợp phần cấu hình kinh nghiệm/trình độ học viên từ Profile vào thẳng Chatbot Q&A (tương tự bên phân vai nhóm) để AI tự động nhận diện và cá nhân hóa câu trả lời mà không bắt học viên chọn thủ công (feedback từ chị Minh Anh).
+     - Tốc độ phản hồi của AI Tutor còn hơi chậm (feedback từ anh Hoàng Hiệp).
+     - Học viên Non-IT mới sử dụng ban đầu còn lúng túng, cần giải thích hoặc hướng dẫn qua mới biết cách bấm các nút chuyển đổi (quan sát từ học viên nữ G25, E402).
+2. **1-2 thay đổi sẽ thực hiện trước demo (ghi nhận vào §9 Changelog của [spec.md]):**
+   - *Thay đổi 1:* Đồng bộ hóa thông tin kinh nghiệm học viên từ Profile Database vào thẳng System Prompt của Chatbot Q&A để chatbot tự động điều chỉnh ngôn ngữ/ẩn dụ phù hợp với người dùng hiện tại (giải quyết trực tiếp feedback của chị Minh Anh).
+   - *Thay đổi 2:* Thêm tooltip hướng dẫn nhanh (Helper Tooltip) trực quan trên Widget chat để người dùng biết cách bấm nút dịch và nút chia nhóm.
 3. **Những phản hồi giữ nguyên (không sửa) kèm lý do/căn cứ:**
-   - *Giữ nguyên:* Không cắt ngắn nội dung giải nghĩa bằng ẩn dụ đời sống của chế độ Non-IT, vì đây là giá trị cốt lõi giúp đối tượng Non-IT hiểu bản chất bài học, dù kết quả AI trả về có thể dài hơn thông thường.
+   - *Giữ nguyên:* Độ trễ của AI Tutor chưa tối ưu sâu bằng code ở thời điểm này vì phụ thuộc vào API OpenAI. Thay vào đó, nhóm bổ sung giao diện Loading State sinh động (spinner) để cải thiện trải nghiệm thị giác của người dùng trong lúc chờ phản hồi.
 4. **Các ý kiến đưa vào backlog (Slide 6 - Nếu có thêm 1 tuần):**
-   - *Ý kiến:* Tích hợp cơ chế Streaming Response (trả kết quả dạng gõ chữ thời gian thực) thay vì đợi nhận toàn bộ câu từ API để giải quyết triệt để phản hồi "AI còn chậm".
+    - *Ý kiến:* Tích hợp cơ chế Streaming Response (stream kết quả phản hồi gõ chữ theo thời gian thực) để giải quyết triệt để vấn đề thời gian phản hồi của AI.
 
