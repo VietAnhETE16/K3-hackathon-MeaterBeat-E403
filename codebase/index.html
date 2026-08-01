@@ -2226,6 +2226,7 @@ Yêu cầu bắt buộc:
 1. Phân công task cụ thể, phù hợp thế mạnh, cho các thành viên.
 2. Lập workflow tổng thể: mỗi task có mã duy nhất, thứ tự thực hiện và dependency. Chỉ ghi dependency nếu thật sự phải chờ đầu ra của task trước; các task độc lập phải có execution là "parallel" và dependsOn là mảng rỗng.
 3. Luôn chọn ĐÚNG MỘT Team Leader từ danh sách học viên. Leader có nhiệm vụ theo dõi tổng thể, tổng hợp bài, rà soát test/artifact/bảo mật và checklist trước khi nộp. Leader vẫn có thể có task chuyên môn riêng.
+4. Nhiệm vụ chung bắt buộc cho từng cá nhân: Do các bài Lab thực hành được code độc lập trên máy cá nhân của từng học viên trước khi gom chung vào một repo, các task chuẩn bị và cài đặt môi trường (như setup môi trường, clone repo, cài đặt thư viện/dependencies, cấu hình API keys...) là nhiệm vụ bắt buộc mà TẤT CẢ mọi thành viên trong nhóm đều phải tự thực hiện. Bạn BẮT BUỘC phải gán các task này cho TẤT CẢ mọi thành viên trong nhóm. Cụ thể: trong mảng 'assignments', phần 'tasks' của TỪNG học viên đều phải chứa các task chuẩn bị này (ví dụ: cùng có task ID "T1" hoặc tạo các task ID song song tương ứng như T1-1, T1-2 cho từng người).
 
 Trả về CHỈ một JSON object hợp lệ, không markdown, đúng schema:
 {
