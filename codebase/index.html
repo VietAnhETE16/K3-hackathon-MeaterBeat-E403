@@ -234,7 +234,7 @@
     <!-- 2. CODELAB VIEW (HIDDEN BY DEFAULT) -->
     <div id="codelab-view" class="w-full h-full flex flex-col overflow-hidden hidden">
         <!-- Top Navigation Bar (Real Codelab Design) -->
-        <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
+        <header class="min-h-14 bg-white border-b border-slate-200 flex items-center justify-between gap-y-2 px-6 py-2 shrink-0 z-10">
             <div class="flex items-center space-x-3">
                 <button onclick="goBackToDashboard()" class="text-slate-500 hover:text-slate-900 transition mr-2 cursor-pointer p-1.5 hover:bg-slate-100 rounded-full flex items-center justify-center border-0 bg-transparent">
                     <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -243,9 +243,11 @@
             </div>
 
             <div class="flex items-center space-x-4 text-xs">
-                <!-- Mock Student Database tag -->
-                <span class="bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium">
-                    <i class="fa-solid fa-database text-[10px]"></i> Database: <span id="db-status-badge">Loaded</span>
+                <!-- Expected output for the lab currently being studied -->
+                <span id="lab-output-expectation" class="max-w-[460px] bg-violet-50 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-xl flex items-start gap-1.5 font-medium" title="Chọn một bài lab để xem đầu ra mong đợi.">
+                    <i class="fa-solid fa-bullseye text-[10px]"></i>
+                    <span class="shrink-0">Output expectation:</span>
+                    <span id="lab-output-expectation-text" class="min-w-0 whitespace-normal leading-tight" aria-live="polite">Chọn một bài lab</span>
                 </span>
                 <!-- Time Capsule -->
                 <div class="flex items-center space-x-1.5 bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-full font-mono text-[11px] font-medium">
@@ -529,6 +531,9 @@
                         <div id="role-result" class="hidden space-y-3 pt-2 border-t border-slate-200 text-left">
                             <div class="font-bold text-emerald-600 flex items-center gap-1.5">
                                 <i class="fa-solid fa-square-check"></i> Kết quả phân công dựa trên Hồ sơ:
+                            </div>
+                            <div id="role-workflow-container" class="space-y-2">
+                                <!-- Dynamic workflow order and dependencies -->
                             </div>
                             <div id="role-cards-container" class="space-y-2">
                                 <!-- Dynamic Role Output -->
@@ -1647,6 +1652,7 @@
             currentLabData = CODELABS_DATA[labId];
 
             document.getElementById('codelab-header-title').innerText = currentLabData.title;
+            updateLabOutputExpectation(currentLabData);
 
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('codelab-view').classList.remove('hidden');
@@ -1668,6 +1674,20 @@
             rebuildCodelabSteps();
             setActiveStep(1);
             preloadPersonalizedGuides();
+        }
+
+        function updateLabOutputExpectation(lab) {
+            const expectation = document.getElementById('lab-output-expectation');
+            const expectationText = document.getElementById('lab-output-expectation-text');
+            if (!expectation || !expectationText) return;
+
+            const outcomes = Array.isArray(lab.outcomes) ? lab.outcomes.filter(Boolean) : [];
+            const primaryOutcome = outcomes[0] || lab.description || 'Hoàn thành yêu cầu của bài lab.';
+
+            expectationText.innerText = primaryOutcome;
+            expectation.title = outcomes.length
+                ? `Đầu ra mong đợi:\n• ${outcomes.join('\n• ')}`
+                : `Đầu ra mong đợi: ${primaryOutcome}`;
         }
 
         function goBackToDashboard() {
@@ -2060,6 +2080,124 @@
             container.innerHTML = html;
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getStudentSkillScore(student) {
+            return (student.skills || []).reduce((total, skill) => total + (Number(skill.level) || 0), 0);
+        }
+
+        function normalizeTask(task, taskIndex, assignmentIndex) {
+            const source = typeof task === 'string' ? { title: task } : (task || {});
+            const order = Number(source.order);
+            return {
+                id: String(source.id || source.workflowId || `T${assignmentIndex + 1}-${taskIndex + 1}`),
+                title: String(source.title || source.task || `Nhiệm vụ ${taskIndex + 1}`),
+                order: Number.isFinite(order) && order > 0 ? order : null,
+                dependsOn: Array.isArray(source.dependsOn) ? source.dependsOn.map(String) : [],
+                execution: source.execution === 'parallel' ? 'parallel' : 'sequential'
+            };
+        }
+
+        function normalizeWorkflow(rawWorkflow, assignments) {
+            const fallbackTasks = assignments.flatMap(assign => assign.tasks.map(task => ({
+                ...task,
+                ownerId: assign.studentId,
+                ownerName: assign.studentName
+            })));
+            const sourceTasks = Array.isArray(rawWorkflow) && rawWorkflow.length > 0 ? rawWorkflow : fallbackTasks;
+
+            return sourceTasks.map((task, index) => {
+                const source = typeof task === 'string' ? { title: task } : (task || {});
+                const matchingTask = fallbackTasks.find(item => item.id === String(source.id || source.workflowId));
+                const order = Number(source.order);
+                return {
+                    id: String(source.id || source.workflowId || matchingTask?.id || `T${index + 1}`),
+                    title: String(source.title || source.task || matchingTask?.title || `Nhiệm vụ ${index + 1}`),
+                    order: Number.isFinite(order) && order > 0 ? order : index + 1,
+                    dependsOn: Array.isArray(source.dependsOn) ? source.dependsOn.map(String) : (matchingTask?.dependsOn || []),
+                    execution: source.execution === 'parallel' ? 'parallel' : (matchingTask?.execution || 'sequential'),
+                    ownerId: String(source.ownerId || matchingTask?.ownerId || ''),
+                    ownerName: String(source.ownerName || matchingTask?.ownerName || '')
+                };
+            }).sort((a, b) => a.order - b.order);
+        }
+
+        function ensureLeader(rawLeader) {
+            const requestedLeader = rawLeader && selectedTeam.find(student => student.id === rawLeader.studentId);
+            const fallbackLeader = [...selectedTeam].sort((a, b) => getStudentSkillScore(b) - getStudentSkillScore(a))[0];
+            const leader = requestedLeader || fallbackLeader;
+            const defaultResponsibilities = [
+                'Theo dõi tiến độ và dependency giữa các task',
+                'Tổng hợp phần việc của cả nhóm thành một bài lab thống nhất',
+                'Rà soát test, artifact, bảo mật và checklist trước khi nộp'
+            ];
+
+            return {
+                studentId: leader.id,
+                studentName: leader.name,
+                role: rawLeader?.role || 'Team Leader & Final Reviewer',
+                responsibilities: Array.isArray(rawLeader?.responsibilities) && rawLeader.responsibilities.length
+                    ? rawLeader.responsibilities.slice(0, 4)
+                    : defaultResponsibilities
+            };
+        }
+
+        function renderWorkflow(workflow) {
+            const workflowContainer = document.getElementById('role-workflow-container');
+            if (!workflowContainer) return;
+
+            const workflowItems = workflow.map(item => {
+                const dependencyText = item.dependsOn.length
+                    ? `Chỉ bắt đầu sau: ${item.dependsOn.join(', ')}`
+                    : item.execution === 'parallel'
+                        ? 'Có thể bắt đầu song song'
+                        : 'Có thể bắt đầu ngay';
+                const dependencyStyle = item.dependsOn.length
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : item.execution === 'parallel'
+                        ? 'bg-sky-50 text-sky-700 border-sky-200'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+
+                return `
+                    <div class="flex items-start gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-2">
+                        <span class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">${item.order}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-[11px] font-semibold leading-relaxed text-slate-700">${escapeHtml(item.title)}</div>
+                            <div class="mt-1 flex flex-wrap gap-1">
+                                <span class="rounded border px-1.5 py-0.5 text-[9px] font-medium ${dependencyStyle}">${escapeHtml(dependencyText)}</span>
+                                ${item.ownerName ? `<span class="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">${escapeHtml(item.ownerName)}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            workflowContainer.innerHTML = `
+                <div class="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3">
+                    <div class="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-700">
+                        <i class="fa-solid fa-route"></i> Thứ tự thực hiện & phụ thuộc
+                    </div>
+                    <div class="space-y-1.5">${workflowItems}</div>
+                </div>`;
+        }
+
+        function askTaskHelp(taskTitle, taskOrder) {
+            const labTitle = currentLabData?.title || 'bài lab hiện tại';
+            const question = `Tôi đang phụ trách ${taskOrder} của ${labTitle}: "${taskTitle}". Hãy hướng dẫn tôi thực hiện task này theo từng bước, nêu điều kiện cần có trước khi bắt đầu, đầu ra cần bàn giao, cách tự kiểm tra và lỗi thường gặp. Không làm hộ; hãy giúp tôi tự hoàn thành.`;
+            const input = document.getElementById('user-input');
+
+            setExplainMode('detail');
+            if (input) input.value = question;
+            askAgentExplain(question);
+            if (input) input.value = '';
+        }
+
         async function generateRoleAssignment() {
             if (selectedTeam.length === 0) return;
 
@@ -2082,7 +2220,23 @@
                 // Construct Context B: Selected team
                 const contextB = JSON.stringify(selectedTeam, null, 2);
 
-                const systemPrompt = `Bạn là Chuyên gia Điều phối Nhân sự dự án AI trên VLearn. Nhiệm vụ của bạn là đọc các Tasks (công việc cần làm) của bài Lab hiện tại và danh sách học viên (kèm theo các kỹ năng/level cụ thể của họ) để tự động phân chia công việc tối ưu nhất. Hãy gán vai trò tương thích cho từng người, đảm bảo mỗi người được phân công nhiệm vụ phù hợp với thế mạnh kỹ năng của họ. Trả về kết quả dưới định dạng JSON có cấu trúc mảng (array) các object như sau để hệ thống dễ dàng phân tích: [ { "studentId": "...", "studentName": "...", "role": "...", "tasks": [ "nhiệm vụ cụ thể 1", "nhiệm vụ cụ thể 2" ], "rationale": "Giải thích ngắn gọn lý do giao vai này dựa trên kỹ năng/mong muốn nào" } ]. Trả về CHỈ duy nhất chuỗi JSON hợp lệ đó, không kèm theo bất kỳ văn bản giải thích hay markdown tags (như \`\`\`json).`;
+                const systemPrompt = `Bạn là Chuyên gia Điều phối Nhân sự dự án AI trên VLearn. Đọc các task của bài Lab hiện tại và danh sách học viên (kèm kỹ năng/level) để lập kế hoạch làm việc khả thi.
+
+Yêu cầu bắt buộc:
+1. Phân công task cụ thể, phù hợp thế mạnh, cho các thành viên.
+2. Lập workflow tổng thể: mỗi task có mã duy nhất, thứ tự thực hiện và dependency. Chỉ ghi dependency nếu thật sự phải chờ đầu ra của task trước; các task độc lập phải có execution là "parallel" và dependsOn là mảng rỗng.
+3. Luôn chọn ĐÚNG MỘT Team Leader từ danh sách học viên. Leader có nhiệm vụ theo dõi tổng thể, tổng hợp bài, rà soát test/artifact/bảo mật và checklist trước khi nộp. Leader vẫn có thể có task chuyên môn riêng.
+
+Trả về CHỈ một JSON object hợp lệ, không markdown, đúng schema:
+{
+  "workflow": [
+    {"id":"T1","order":1,"title":"...","dependsOn":[],"execution":"sequential hoặc parallel","ownerId":"...","ownerName":"..."}
+  ],
+  "assignments": [
+    {"studentId":"...","studentName":"...","role":"...","tasks":[{"id":"T1","title":"..."}],"rationale":"..."}
+  ],
+  "leader": {"studentId":"...","studentName":"...","role":"Team Leader & Final Reviewer","responsibilities":["...","...","..."]}
+}`;
                 const userPrompt = `Dưới đây là các tasks bài Lab:\n${contextA}\n\nDanh sách học viên:\n${contextB}`;
 
                 const responseText = await callRealLLM(systemPrompt, userPrompt);
@@ -2092,22 +2246,76 @@
                     jsonText = jsonText.replace(/^```(json)?/, '').replace(/```$/, '').trim();
                 }
 
-                const assignments = JSON.parse(jsonText);
-                
-                let html = '';
-                assignments.forEach(assign => {
-                    const tasksChecklist = assign.tasks.map((task, idx) => `
-                        <label class="flex items-start gap-2 py-1 px-1.5 hover:bg-slate-50 rounded transition cursor-pointer select-none">
-                            <input type="checkbox" class="mt-0.5 accent-orange-600 cursor-pointer rounded border-slate-300 shrink-0">
-                            <span class="text-[11px] text-slate-600 leading-relaxed">${task}</span>
-                        </label>
-                    `).join('');
+                const parsedPlan = JSON.parse(jsonText);
+                const plan = Array.isArray(parsedPlan) ? { assignments: parsedPlan } : parsedPlan;
+                if (!Array.isArray(plan.assignments) || plan.assignments.length === 0) {
+                    throw new Error('AI chưa trả về danh sách phân công hợp lệ.');
+                }
 
+                const assignments = plan.assignments.map((assignment, assignmentIndex) => ({
+                    studentId: String(assignment.studentId || ''),
+                    studentName: String(assignment.studentName || 'Thành viên nhóm'),
+                    role: String(assignment.role || 'Thành viên thực hiện'),
+                    tasks: Array.isArray(assignment.tasks)
+                        ? assignment.tasks.map((task, taskIndex) => normalizeTask(task, taskIndex, assignmentIndex))
+                        : [],
+                    rationale: String(assignment.rationale || '')
+                }));
+                const workflow = normalizeWorkflow(plan.workflow, assignments);
+                const workflowById = new Map(workflow.map(item => [item.id, item]));
+                assignments.forEach(assignment => {
+                    assignment.tasks.forEach(task => {
+                        const workflowTask = workflowById.get(task.id);
+                        if (!workflowTask) return;
+                        task.order = workflowTask.order;
+                        task.dependsOn = workflowTask.dependsOn;
+                        task.execution = workflowTask.execution;
+                    });
+                });
+                const leader = ensureLeader(plan.leader);
+                renderWorkflow(workflow);
+                
+                const leaderResponsibilities = leader.responsibilities.map(item => `
+                    <li class="flex items-start gap-1.5 text-[10px] leading-relaxed text-indigo-800">
+                        <i class="fa-solid fa-check mt-0.5 text-[8px]"></i>${escapeHtml(item)}
+                    </li>`).join('');
+                let html = `
+                    <div class="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50 to-violet-50 p-3 shadow-sm">
+                        <div class="flex items-center justify-between gap-2 border-b border-indigo-100 pb-1.5">
+                            <span class="font-bold text-indigo-800"><i class="fa-solid fa-crown mr-1"></i>${escapeHtml(leader.studentName)} ➔ ${escapeHtml(leader.role)}</span>
+                            <span class="rounded bg-white px-1.5 py-0.5 text-[9px] font-medium text-indigo-700">Người tổng kết</span>
+                        </div>
+                        <ul class="mt-2 space-y-1">${leaderResponsibilities}</ul>
+                    </div>`;
+                assignments.forEach(assign => {
+                    const tasksChecklist = assign.tasks.map((task, idx) => {
+                        const taskOrder = task.order ? `Task ${task.order}` : `Task ${idx + 1}`;
+                        const dependencyText = task.dependsOn.length
+                            ? `Chờ ${task.dependsOn.join(', ')}`
+                            : task.execution === 'parallel' ? 'Song song' : 'Bắt đầu ngay';
+                        const encodedTask = encodeURIComponent(task.title).replace(/'/g, '%27');
+                        return `
+                        <div class="flex items-start gap-1 py-1 px-1.5 hover:bg-slate-50 rounded transition">
+                            <label class="flex min-w-0 flex-1 items-start gap-2 cursor-pointer select-none">
+                                <input type="checkbox" class="mt-0.5 accent-orange-600 cursor-pointer rounded border-slate-300 shrink-0">
+                                <span class="min-w-0">
+                                    <span class="block text-[11px] text-slate-600 leading-relaxed">${escapeHtml(task.title)}</span>
+                                    <span class="mt-1 flex flex-wrap gap-1">
+                                        <span class="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">${taskOrder}</span>
+                                        <span class="rounded bg-amber-50 px-1.5 py-0.5 text-[9px] font-medium text-amber-700">${escapeHtml(dependencyText)}</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <button onclick="askTaskHelp(decodeURIComponent('${encodedTask}'), '${taskOrder}')" title="Hỏi AI Tutor cách làm task này" class="shrink-0 rounded-md border border-indigo-200 bg-indigo-50 px-2 py-1 text-[10px] font-semibold text-indigo-700 hover:bg-indigo-100 cursor-pointer">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Hỏi AI
+                            </button>
+                        </div>`;
+                    }).join('');
                     html += `
                     <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-2 shadow-sm text-slate-700">
                         <div class="font-bold text-orange-600 flex justify-between items-center border-b pb-1.5 border-slate-100">
-                            <span>${assign.studentName} ➔ ${assign.role}</span>
-                            <span class="text-[10px] bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded font-medium">${assign.studentId}</span>
+                            <span>${escapeHtml(assign.studentName)} ➔ ${escapeHtml(assign.role)}</span>
+                            <span class="text-[10px] bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded font-medium">${escapeHtml(assign.studentId)}</span>
                         </div>
                         <div class="space-y-1">
                             <span class="text-[9px] font-bold text-slate-400 block uppercase">Nhiệm vụ được giao:</span>
@@ -2129,9 +2337,9 @@
                         const rationaleText = assign.rationale || 'Được gán dựa trên phân tích năng lực mặc định.';
                         tbodyHtml += `
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
-                                <td class="p-2 font-bold text-slate-800 text-[11px]">${assign.studentName}</td>
-                                <td class="p-2"><span class="bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${assign.role}</span></td>
-                                <td class="p-2 text-slate-600 leading-normal text-[11px]">${rationaleText}</td>
+                                <td class="p-2 font-bold text-slate-800 text-[11px]">${escapeHtml(assign.studentName)}</td>
+                                <td class="p-2"><span class="bg-orange-50 text-orange-600 border border-orange-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${escapeHtml(assign.role)}</span></td>
+                                <td class="p-2 text-slate-600 leading-normal text-[11px]">${escapeHtml(rationaleText)}</td>
                             </tr>
                         `;
                     });
